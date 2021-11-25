@@ -1,0 +1,157 @@
+$pale-light-green: #f1f7ed;
+$light-green: #e0eec6;
+$green: #7ca982;
+$dark-green: #243e36;
+$grey: #ced4da;
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: Space Grotesk !important;
+}
+
+h1 {
+  font-weight: 600 !important;
+  color: $light-green !important ;
+}
+h2 {
+  font-weight: 600 !important;
+  color: $dark-green !important;
+}
+
+h3,
+h4 {
+  color: $dark-green !important;
+}
+
+p {
+  color: #798da3;
+}
+
+@media screen and (max-width: 374px) {
+  h1,
+  h2 {
+    font-size: 26px !important;
+  }
+  h3 {
+    font-size: 20px !important;
+  }
+  h4 {
+    font-size: 15px !important;
+  }
+  p {
+    font-size: 12px !important;
+  }
+}
+
+/* xs */
+@media only screen and (max-width: 576px) and (min-width: 374px) {
+  h1,
+  h2 {
+    font-size: 28px !important;
+  }
+  h3 {
+    font-size: 21px !important;
+  }
+  h4 {
+    font-size: 16px !important;
+  }
+  p {
+    font-size: 12px !important;
+  }
+}
+
+/* s */
+@media only screen and (max-width: 768px) and (min-width: 576px) {
+  h1,
+  h2 {
+    font-size: 32px !important;
+  }
+  h3 {
+    font-size: 24px !important;
+  }
+  h4 {
+    font-size: 18px !important;
+  }
+  p {
+    font-size: 14px !important;
+  }
+}
+
+/* m */
+@media only screen and (max-width: 992px) and (min-width: 768px) {
+  h1,
+  h2 {
+    font-size: 34px !important;
+  }
+  h3 {
+    font-size: 26px !important;
+  }
+  h4 {
+    font-size: 20px !important;
+  }
+  p {
+    font-size: 14px !important;
+  }
+}
+
+/* lg */
+@media only screen and (max-width: 1200px) and (min-width: 992px) {
+  h1,
+  h2 {
+    font-size: 38px !important;
+  }
+  h3 {
+    font-size: 28px !important;
+  }
+  h4 {
+    font-size: 21px !important;
+  }
+  p {
+    font-size: 16px !important;
+  }
+}
+
+/* xl */
+@media only screen and (min-width: 1200px) {
+  h1,
+  h2 {
+    font-size: 38px !important;
+  }
+  h3 {
+    font-size: 28px !important;
+  }
+  h4 {
+    font-size: 21px !important;
+  }
+  p {
+    font-size: 16px !important;
+  }
+}
+
+.hvr-grow {
+  -webkit-transition-duration: 0.3s !important;
+  transition-duration: 0.3s !important;
+  -webkit-transition-property: transform !important;
+  transition-property: transform !important;
+}
+.hvr-grow:hover,
+.hvr-grow:focus,
+.hvr-grow:active {
+  -webkit-transform: scale(1.1) !important;
+  transform: scale(1.1) !important;
+}
+
+.btn-color1 {
+  background-color: $light-green !important;
+  color: $dark-green !important;
+  padding: 5px 25px !important;
+}
+
+img {
+  z-index: -1;
+  position: relative;
+  object-fit: cover;
+}
