@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import "./styles.scss";
+
 class Footer extends Component {
   render() {
     return (
@@ -9,7 +11,7 @@ class Footer extends Component {
             <div className="page-divider mb-5"></div>
             <div className="row">
               <div className="col-lg-3 d-flex justify-content-start mb-4 mb-lg-0">
-                <a href="index.html" className="hvr-grow">
+                <a href="index.html" className="hvr-grow footer-logo">
                   <h4 className="footer-logo">
                     COOK<span className="footer-logo-light">BOOK</span>
                   </h4>

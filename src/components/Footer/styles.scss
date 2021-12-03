@@ -1,0 +1,27 @@
+$pale-light-green: #f1f7ed;
+$light-green: #e0eec6;
+$green: #7ca982;
+$dark-green: #243e36;
+$grey: #ced4da;
+
+footer {
+  padding: 20px 0;
+}
+
+.footer-link {
+  color: #798da3;
+}
+.footer-link:hover {
+  color: $green;
+}
+
+.footer-logo {
+  color: $dark-green !important;
+  font-family: Bebas Neue;
+  font-size: 28px !important;
+  text-decoration: none !important;
+}
+
+.footer-logo-light {
+  color: $green;
+}
