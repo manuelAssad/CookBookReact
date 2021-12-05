@@ -7,7 +7,24 @@ import Groceries from "./GroceriesPage";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route, Redirect, withRouter } from "react-router-dom";
+import { connect } from "react-redux";
+import {
+  fetchGroceryInstances,
+  fetchGroceryCategories,
+} from "../redux/ActionCreators";
+
+const mapStateToProps = (state) => {
+  return {
+    groceryInstances: state.groceryInstances,
+    groceryCategories: state.groceryCategories,
+  };
+};
+
+const mapDispatchToProps = {
+  fetchGroceryInstances: () => fetchGroceryInstances(),
+  fetchGroceryCategories: () => fetchGroceryCategories(),
+};
 
 class Main extends Component {
   constructor(props) {
@@ -17,11 +34,29 @@ class Main extends Component {
     };
   }
 
+  componentDidMount() {
+    this.props.fetchGroceryInstances();
+    this.props.fetchGroceryCategories();
+  }
+
   handleSectionChange = (section) => {
     this.setState({ currentSection: section });
   };
 
   render() {
+    const GroceriesComponent = () => {
+      return (
+        <Groceries
+          groceryInstances={this.props.groceryInstances.groceryInstances}
+          groceryInstancesLoading={this.props.groceryInstances.isLoading}
+          groceryInstancesErrMess={this.props.groceryInstances.errMess}
+          groceryCategories={this.props.groceryCategories.groceryCategories}
+          groceryCategoriesLoading={this.props.groceryCategories.isLoading}
+          groceryCategoriesErrMess={this.props.groceryCategories.errMess}
+        />
+      );
+    };
+
     return (
       <div>
         <Header
@@ -35,7 +70,7 @@ class Main extends Component {
               <HomePage handleSectionChange={this.handleSectionChange} />
             )}
           />
-          <Route exact path="/groceries" component={Groceries} />
+          <Route exact path="/groceries" component={GroceriesComponent} />
           <Route exact path="/recipes" component={Recipes} />
           <Redirect to="/home" />
         </Switch>
@@ -45,4 +80,4 @@ class Main extends Component {
   }
 }
 
-export default Main;
+export default withRouter(connect(mapStateToProps, mapDispatchToProps)(Main));

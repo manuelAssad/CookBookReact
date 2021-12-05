@@ -1,15 +1,9 @@
-import React, { Component } from 'react';
-
+import React, { Component } from "react";
 
 class Recipes extends Component {
-
   render() {
-      return (
-        <div>
-          Recipes
-        </div>
-      );
-    }
+    return <>Recipes</>;
+  }
 }
 
 export default Recipes;
