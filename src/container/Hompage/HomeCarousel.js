@@ -51,7 +51,7 @@ const Example = (props) => {
       <CarouselItem
         onExiting={() => setAnimating(true)}
         onExited={() => setAnimating(false)}
-        key={item.src}
+        key={item.id}
       >
         <div className="image-gradient">
           <img

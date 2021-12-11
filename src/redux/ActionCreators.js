@@ -82,3 +82,172 @@ export const addGroceryCategories = (groceryCategories) => ({
   type: ActionTypes.ADD_GROCERY_CATEGORIES,
   payload: groceryCategories,
 });
+
+export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
+  console.log(categoriesFetched, id, "categoriesFetchedcategoriesFetched");
+
+  //if fetched a certain category or all categories don't fetch again
+  if (categoriesFetched.includes(id) || categoriesFetched.includes("all")) {
+    // just filter if fetched before
+    dispatch(filterRecipes(id));
+  } else {
+    dispatch(setRecipeCategoriesFetched(id));
+    dispatch(recipesLoading());
+    return fetch(
+      baseUrl + `recipes${id !== null ? `?recipe_category.id=${id}` : ""}`
+    )
+      .then(
+        (response) => {
+          if (response.ok) {
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
+          const errMess = new Error(error.message);
+          throw errMess;
+        }
+      )
+      .then((response) => response.json())
+      .then((recipes) => dispatch(addRecipes(recipes, id)))
+      .catch((error) => dispatch(recipesFailed(error.message)));
+  }
+};
+
+export const filterRecipes = (id) => ({
+  type: ActionTypes.FILTER_RECIPES,
+  payload: id,
+});
+
+export const setRecipeCategoriesFetched = (id) => ({
+  type: ActionTypes.SET_RECIPES_CATEGORIES_FETCHED,
+  payload: id,
+});
+
+export const recipesLoading = () => ({
+  type: ActionTypes.RECIPES_LOADING,
+});
+
+export const recipesFailed = (errMess) => ({
+  type: ActionTypes.RECIPES_FAILED,
+  payload: errMess,
+});
+
+export const addRecipes = (recipes, category) => ({
+  type: ActionTypes.ADD_RECIPES,
+  payload: recipes,
+  category,
+});
+
+export const createRef = () => ({
+  type: ActionTypes.CREATE_REF,
+});
+
+export const addNewGrocery = (grocery) => ({
+  type: ActionTypes.ADD_NEW_GROCERY,
+  payload: grocery,
+});
+
+export const modifyNewGrocery = (grocery) => ({
+  type: ActionTypes.MODIFY_NEW_GROCERY,
+  payload: grocery,
+});
+
+export const postGrocery = (grocery) => (dispatch) => {
+  console.log("ADDGROCERYYYY", grocery);
+  const newGrocery = {
+    grocery: {
+      ...grocery,
+      category: grocery.category.id,
+    },
+    custom_image: null,
+    detail: "",
+    user: 0,
+    timestamp: Date.now(),
+  };
+  dispatch(addNewGrocery(newGrocery));
+
+  return fetch(baseUrl + "grocery-instances", {
+    method: "POST",
+    body: JSON.stringify(newGrocery),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => dispatch(modifyNewGrocery(response)))
+    .catch((error) => {
+      alert("Your grocery could not be posted\nError: " + error.message);
+    });
+};
+
+export const groceriesLoading = () => ({
+  type: ActionTypes.GROCERY_INSTANCES_LOADING,
+});
+
+export const groceriesFailed = (errMess) => ({
+  type: ActionTypes.GROCERIES_FAILED,
+  payload: errMess,
+});
+
+export const addGroceries = (groceries) => ({
+  type: ActionTypes.ADD_GROCERIES,
+  payload: groceries,
+});
+
+export const filterGroceries = (value) => ({
+  type: ActionTypes.FILTER_GROCERIES,
+  payload: value,
+});
+
+export const fetchGroceries = () => (dispatch) => {
+  dispatch(groceriesLoading());
+
+  return fetch(baseUrl + "groceries")
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        const errMess = new Error(error.message);
+        throw errMess;
+      }
+    )
+    .then((response) => response.json())
+    .then((groceries) => dispatch(addGroceries(groceries)))
+    .catch((error) => dispatch(groceriesFailed(error.message)));
+};
+
+export const setSearchActive = (value) => ({
+  type: ActionTypes.SET_SEARCH_ACTIVE,
+  payload: value,
+});

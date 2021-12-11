@@ -8,28 +8,45 @@ const GroceriesList = (props) => {
     >
       <div className="container mb-2">
         <div className="row mt-3 mt-lg-0">
-          <h3 className="grocery-sec-header">
-            {props.category.name}{" "}
-            <small>
-              (
-              {
-                props.groceryInstances.filter(
-                  (grocery) => grocery.grocery.category === props.category.id
-                ).length
-              }{" "}
-              Items )
-            </small>
-          </h3>
+          {props.hasItems ? (
+            <h3 className="grocery-sec-header">
+              {props.category.name}{" "}
+              <small>
+                (
+                {
+                  props.groceryInstances.filter(
+                    (grocery) => grocery.grocery.category === props.category.id
+                  ).length
+                }{" "}
+                Items )
+              </small>
+            </h3>
+          ) : null}
         </div>
         <div className="row">
-          {props.groceryInstances.map((item) => {
+          {props.groceryInstances.map((item, index) => {
             if (item.grocery.category === props.category.id)
               return (
-                <div className="col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0 ">
-                  <div className="small-card-padding">
+                <div
+                  className="col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0"
+                  key={item.id}
+                >
+                  <div
+                    className={`small-card-padding ${
+                      item.new && index + 1 === props.groceryInstances.length
+                        ? "blinking"
+                        : ""
+                    }`}
+                  >
                     <div className="card border-r-top-left">
                       <div className="card-header border-r-top-left">
-                        <h4 className="grocery-header">{item.grocery.name}</h4>
+                        <h4
+                          className={`grocery-header ${
+                            item.id !== undefined ? "" : "red-header"
+                          }`}
+                        >
+                          {item.grocery.name}
+                        </h4>
                         <input
                           className="grocery-note d-none d-lg-block"
                           placeholder="add detail"

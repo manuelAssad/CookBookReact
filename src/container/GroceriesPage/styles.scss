@@ -133,6 +133,10 @@ $grey: #ced4da;
   padding: 1px;
 }
 
+.card-opacity {
+  opacity: 0.6;
+}
+
 .border-r-top-left {
   border-radius: 10px 0 0 0 !important;
 }
@@ -207,18 +211,37 @@ $grey: #ced4da;
   max-height: 100vh;
   padding-bottom: 70vh;
   overflow-y: auto;
-  display: none;
   border-radius: 3px;
   margin-left: -16px;
 }
-
+.search-close-cont {
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+.search-close {
+  position: fixed;
+  padding: 0px 8px 1px 8px;
+  background-color: $dark-green;
+  border-radius: 100px;
+  margin-top: 5px;
+  margin-right: 8px;
+  color: $pale-light-green;
+}
 .btn-ing-search {
-  background-color: $light-green !important;
-  color: $dark-green !important;
+  background-color: $green !important;
+  color: $pale-light-green !important;
   border-color: $grey !important;
   padding: 0 30px !important;
   border-radius: 0 3px 3px 0 !important;
   display: none;
+}
+
+.btn-ing-search-inactive {
+  background-color: $light-green !important;
+  cursor: default !important;
+  color: white !important;
 }
 
 @media (min-width: 992px) {
@@ -317,6 +340,7 @@ $grey: #ced4da;
 
 .added-item {
   color: inherit;
+  cursor: pointer;
 }
 
 .grocery-modal-image {
@@ -439,7 +463,7 @@ $grey: #ced4da;
   width: 65%;
 }
 
-.recipe-details {
+.recipe-details.recipe-details {
   position: absolute;
   bottom: 15px;
   display: flex;
@@ -754,4 +778,30 @@ $grey: #ced4da;
 
 .list-group-item {
   cursor: pointer;
+}
+
+.red-header {
+  color: red !important;
+}
+
+.blinking {
+  animation: blinkingText 1.8s;
+}
+
+@keyframes blinkingText {
+  0% {
+    opacity: 1;
+  }
+  39% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
 }

@@ -10,7 +10,6 @@ export const GroceryCategories = (
 ) => {
   switch (action.type) {
     case ActionTypes.ADD_GROCERY_CATEGORIES:
-      console.log("GROCERY CATEGORIESS", action.payload);
       return {
         ...state,
         isLoading: false,
