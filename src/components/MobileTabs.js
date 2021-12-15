@@ -28,7 +28,6 @@ class MobileTabs extends Component {
               }`}
               onClick={() => this.props.onTabClick(item.id)}
             >
-              {console.log(item.id, this.props.activeTab, "COMPAREEEE")}
               {item.name}
             </div>
           );

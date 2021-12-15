@@ -76,8 +76,6 @@ export const GroceryInstances = (
       groceryInstancesCopy2.splice(indexOfNewItem, 1);
       groceryInstancesCopy2.splice(indexOfNewItem, 0, action.payload);
 
-      console.log("NEWWWGROCERYINSTANCESS", groceryInstancesCopy2);
-
       return {
         ...state,
         groceryInstances: groceryInstancesCopy2,

@@ -95,8 +95,6 @@ export const handleSectionChange = (categoryId) => ({
 });
 
 export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
-  console.log(categoriesFetched, id, "categoriesFetchedcategoriesFetched");
-
   //if fetched a certain category or all categories don't fetch again
   if (categoriesFetched.includes(id) || categoriesFetched.includes("all")) {
     // just filter if fetched before

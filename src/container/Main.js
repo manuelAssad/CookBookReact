@@ -44,7 +44,6 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    console.log("MOUNTEDDMAINNN");
     this.props.createRef();
     this.props.fetchGroceryInstances();
     this.props.fetchGroceryCategories();

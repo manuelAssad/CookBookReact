@@ -58,7 +58,6 @@ const GroceriesList = (props) => {
                           !index ? "border-r-top-left" : "no-border-r"
                         }`}
                       >
-                        {console.log("ITEMMISDDDD", item.id)}
                         <h4
                           className={`grocery-header ${
                             item.id !== undefined ? "" : "red-header"
