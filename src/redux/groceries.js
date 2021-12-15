@@ -7,6 +7,7 @@ export const Groceries = (
     groceries: [],
     filteredGroceries: [],
     searchActive: false,
+    newGroceryName: "",
   },
   action
 ) => {
@@ -32,6 +33,9 @@ export const Groceries = (
       return { ...state, filteredGroceries: newFilteredGroceries };
     case ActionTypes.SET_SEARCH_ACTIVE:
       return { ...state, searchActive: action.payload };
+    case ActionTypes.CHANGE_GROCERY_SEARCH_VALUE:
+      return { ...state, newGroceryName: action.payload };
+
     default:
       return state;
   }

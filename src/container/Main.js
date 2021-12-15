@@ -55,33 +55,11 @@ class Main extends Component {
   //   return false;
   // }
 
-  handleSectionChange = (section) => {
+  handleScrollSectionChange = (section) => {
     this.setState({ currentSection: section });
   };
 
   render() {
-    const GroceriesComponent = (props) => {
-      return (
-        <Groceries
-          groceryInstances={this.props.groceryInstances.groceryInstances}
-          groceryInstancesLoading={this.props.groceryInstances.isLoading}
-          groceryInstancesErrMess={this.props.groceryInstances.errMess}
-          groceryCategories={this.props.groceryCategories.groceryCategories}
-          groceryCategoriesLoading={this.props.groceryCategories.isLoading}
-          groceryCategoriesErrMess={this.props.groceryCategories.errMess}
-          postGrocery={this.props.postGrocery}
-          refObj={this.props.groceryInstances.refObj}
-          newCategory={this.props.groceryInstances.newCategory}
-          history={props.history}
-          groceries={this.props.groceries.groceries}
-          groceriesLoading={this.props.groceries.isLoading}
-          groceriesErrMess={this.props.groceries.errMess}
-          setSearchActive={this.props.setSearchActive}
-          searchActive={this.props.groceries.searchActive}
-        />
-      );
-    };
-
     const RecipesComponent = (props) => {
       return <Recipes history={props.history} />;
     };
@@ -90,13 +68,15 @@ class Main extends Component {
       <div>
         <Header
           currentSection={this.state.currentSection}
-          handleSectionChange={this.handleSectionChange}
+          handleScrollSectionChange={this.handleScrollSectionChange}
         />
         <Switch>
           <Route
             path="/home"
             render={() => (
-              <HomePage handleSectionChange={this.handleSectionChange} />
+              <HomePage
+                handleScrollSectionChange={this.handleScrollSectionChange}
+              />
             )}
           />
           <Route

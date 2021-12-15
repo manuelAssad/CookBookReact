@@ -1,6 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./styles.scss";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import { handleClickCategory } from "../../redux/ActionCreators";
+
 import {
   Collapse,
   Navbar,
@@ -13,28 +17,70 @@ import {
 
 import { NavLink as NavLinkR } from "react-router-dom";
 
+import SearchBar from "../SearchBar";
+import MobileTabs from "../MobileTabs";
+
 const NavbarComponent = (props) => {
+  const groceryCategories = useSelector((state) => state.groceryCategories);
+  const groceryInstances = useSelector((state) => state.groceryInstances);
+  const recipes = useSelector((state) => state.recipes);
+  const dispatch = useDispatch();
+
   const [isOpen, setIsOpen] = useState(false);
   const [isHomePage, setIsHomePage] = useState(true);
+
+  const [pageName, setPageName] = useState("");
+
+  const [mobileTabsData, setMobileTabsData] = useState([]);
   const toggle = () => setIsOpen(!isOpen);
 
   const handleNavItemClick = (sectionId) => {
-    props.handleSectionChange(sectionId);
+    if (sectionId === "groceries" || sectionId === "recipes")
+      setPageName(sectionId);
+    else setPageName("homepage");
+    props.handleScrollSectionChange(sectionId);
     setIsOpen(false);
   };
 
   useEffect(() => {
+    const mobileTabsDataCalc = [];
+    groceryCategories.groceryCategories.forEach((gc) => {
+      if (
+        groceryInstances.groceryInstances.filter(
+          (gI) => gI.grocery.category === gc.id
+        ).length
+      ) {
+        mobileTabsDataCalc.push(gc);
+      }
+    });
+    setMobileTabsData(mobileTabsDataCalc);
+
+    // const mobileTabsDataCalc = [];
+    // groceryCategories.groceryCategories.forEach((gc) => {
+    //   if (
+    //     groceryInstances.groceryInstances.filter(
+    //       (gI) => gI.grocery.category === gc.id
+    //     ).length
+    //   ) {
+    //     mobileTabsDataCalc.push(gc);
+    //   }
+    // });
+    // setMobileTabsData(mobileTabsDataCalc);
+
     setIsHomePage(true);
     const urlValue = window.location.href;
-    if (urlValue.includes("groceries")) {
-      props.handleSectionChange("/groceries");
+    if (urlValue.includes("/groceries")) {
+      setPageName("groceries");
       setIsHomePage(false);
     } else if (urlValue.includes("/recipes")) {
-      props.handleSectionChange("recipes");
+      setPageName("recipes");
       setIsHomePage(false);
     }
-  }, [props.currentSection]);
+  }, [props.currentSection, groceryCategories, pageName]);
 
+  const handleRecipeTabClick = (id) => {
+    recipes.history.push(`/recipes${id !== null ? `?category=${id}` : ""}`);
+  };
   return (
     <>
       <div>
@@ -47,7 +93,7 @@ const NavbarComponent = (props) => {
             <Nav className="mx-auto" navbar>
               <NavItem
                 className={`nav-item px-3 px-lg-0 pr-lg-3 mb-3 mb-lg-0 ${
-                  props.currentSection === 0 ? "active" : ""
+                  props.currentSection === 0 && isHomePage ? "active" : ""
                 }`}
               >
                 {isHomePage ? (
@@ -117,6 +163,31 @@ const NavbarComponent = (props) => {
               </a>
             </NavbarText>
           </Collapse>
+
+          {window.innerWidth < 992 &&
+          (pageName === "groceries" || pageName === "recipes") ? (
+            <SearchBar />
+          ) : null}
+
+          {pageName === "groceries" ? (
+            <MobileTabs
+              key={pageName}
+              data={mobileTabsData}
+              activeTab={groceryCategories.activeCat}
+              onTabClick={(id) =>
+                dispatch(handleClickCategory(id, groceryInstances.refObj))
+              }
+              groupName={"groceryCategories"}
+            />
+          ) : pageName === "recipes" ? (
+            <MobileTabs
+              key={pageName}
+              data={recipes.categories}
+              activeTab={recipes.activeRecipeCategory}
+              onTabClick={handleRecipeTabClick}
+              groupName={"recipeCategories"}
+            />
+          ) : null}
         </Navbar>
       </div>
     </>

@@ -14,7 +14,7 @@ class Homepage extends Component {
       <div>
         <ReactScrollDetect
           triggerPoint="center"
-          onChange={this.props.handleSectionChange}
+          onChange={this.props.handleScrollSectionChange}
           triggerPoint="center"
         >
           <DetectSection>

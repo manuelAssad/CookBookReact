@@ -25,7 +25,7 @@ const RecipeMenu = (props) => {
             aria-label="Recipient's username"
             aria-describedby="basic-addon2"
           ></input>
-
+          {/* 
           <div className="search-box">
             <div className="search-cat">Suggested Recipes</div>
             <div className="mb-1 pb-2 ml-1 border-bottom">Chicken Alfredo</div>
@@ -35,7 +35,7 @@ const RecipeMenu = (props) => {
               Cookies & Cream Ice Cream
             </div>
             <div className="mb-1 pb-2 ml-1 border-bottom">Apple Tart</div>
-          </div>
+          </div> */}
         </div>
 
         <a

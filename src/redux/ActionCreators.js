@@ -83,6 +83,17 @@ export const addGroceryCategories = (groceryCategories) => ({
   payload: groceryCategories,
 });
 
+export const handleClickCategory = (id, ref) => ({
+  type: ActionTypes.CLICK_CATEGORY,
+  payload: id,
+  ref,
+});
+
+export const handleSectionChange = (categoryId) => ({
+  type: ActionTypes.CATEGORY_SECTION_CHANGE,
+  payload: categoryId,
+});
+
 export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
   console.log(categoriesFetched, id, "categoriesFetchedcategoriesFetched");
 
@@ -144,6 +155,11 @@ export const addRecipes = (recipes, category) => ({
   category,
 });
 
+export const setRecipeCategory = (cat) => ({
+  type: ActionTypes.SET_RECIPE_CATEGORY,
+  payload: cat,
+});
+
 export const createRef = () => ({
   type: ActionTypes.CREATE_REF,
 });
@@ -159,7 +175,6 @@ export const modifyNewGrocery = (grocery) => ({
 });
 
 export const postGrocery = (grocery) => (dispatch) => {
-  console.log("ADDGROCERYYYY", grocery);
   const newGrocery = {
     grocery: {
       ...grocery,
@@ -250,4 +265,26 @@ export const fetchGroceries = () => (dispatch) => {
 export const setSearchActive = (value) => ({
   type: ActionTypes.SET_SEARCH_ACTIVE,
   payload: value,
+});
+
+export const handleChangeNewGrocery = (v) => ({
+  type: ActionTypes.CHANGE_GROCERY_SEARCH_VALUE,
+  payload: v,
+});
+
+export const handleChooseGrocery = (grocery, ref) => (dispatch) => {
+  dispatch(handleSectionChange(grocery.category.id));
+  if (window.innerWidth < 992) dispatch(setSearchActive(false));
+  dispatch(postGrocery(grocery, ref));
+};
+
+export const handleSubmitNewGrocery = (grocery, ref) => (dispatch) => {
+  dispatch(handleSectionChange(grocery.category.id));
+  if (window.innerWidth < 992) dispatch(setSearchActive(false));
+  dispatch(postGrocery(grocery, ref));
+};
+
+export const setHistory = (history) => ({
+  type: ActionTypes.SET_HISTORY,
+  payload: history,
 });

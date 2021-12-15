@@ -5,6 +5,8 @@ export const GroceryCategories = (
     isLoading: true,
     errMess: null,
     groceryCategories: [],
+    activeCat: 0,
+    newGroceryName: "",
   },
   action
 ) => {
@@ -25,6 +27,26 @@ export const GroceryCategories = (
       };
     case ActionTypes.GROCERY_CATEGORIES_FAILED:
       return { ...state, isLoading: false, errMess: action.payload };
+
+    case ActionTypes.CATEGORY_SECTION_CHANGE:
+      const categoryId = state.groceryCategories[action.payload].id;
+      if (
+        document.getElementById(`mobile-tab-groceryCategories-${categoryId}`)
+      ) {
+        document
+          .getElementById(`mobile-tab-groceryCategories-${categoryId}`)
+          .scrollIntoView({
+            block: "end",
+            inline: "nearest",
+          });
+      }
+
+      return { ...state, activeCat: categoryId };
+
+    case ActionTypes.CLICK_CATEGORY:
+      const scrollData = action.ref[`c${action.payload}`].current;
+      window.scrollTo(0, scrollData.offsetTop);
+      return { ...state, activeCat: action.payload };
     default:
       return state;
   }

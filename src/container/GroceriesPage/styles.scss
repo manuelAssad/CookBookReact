@@ -37,7 +37,7 @@ $grey: #ced4da;
 
     position: relative;
     border-width: 2px 2px 0 2px;
-    border-radius: 3px 3px 0 0;
+    border-radius: 3px 3px 0 0 !important;
     .grocery-edit-btn {
       display: block !important;
       background-color: $green;
@@ -72,10 +72,10 @@ $grey: #ced4da;
     text-overflow: ellipsis;
     padding-right: 2px !important;
     padding-left: 2px !important;
-    padding-bottom: 4px;
+    padding-bottom: 4px !important;
   }
   .card {
-    background-color: $pale-light-green;
+    background-color: $pale-light-green !important;
   }
   // .card:hover{
   //     background-color: $light-green;
@@ -101,10 +101,10 @@ $grey: #ced4da;
 }
 
 .card-header {
-  border-width: 0px;
+  border-width: 0px !important;
   font-size: 18px;
   text-align: center;
-  background-color: $pale-light-green;
+  background-color: $pale-light-green !important;
   border-color: $light-green !important;
   white-space: nowrap;
 }
@@ -129,6 +129,18 @@ $grey: #ced4da;
   min-height: 50vh;
 }
 
+@media (max-width: 992px) {
+  .groceries-list-container {
+    margin-top: 120px;
+  }
+}
+
+@media (max-width: 992px) {
+  .recipes-list-container {
+    margin-top: 178px;
+  }
+}
+
 .small-card-padding {
   padding: 1px;
 }
@@ -137,6 +149,9 @@ $grey: #ced4da;
   opacity: 0.6;
 }
 
+.border-r-one-item {
+  border-radius: 10px 0 10px 0 !important;
+}
 .border-r-top-left {
   border-radius: 10px 0 0 0 !important;
 }
@@ -146,11 +161,15 @@ $grey: #ced4da;
 }
 
 .border-r-bottom-right {
-  border-radius: 0 0 10px 0;
+  border-radius: 0 0 10px 0 !important;
 }
 
 .border-r-bottom-left {
-  border-radius: 0 0 0 10px;
+  border-radius: 0 0 0 10px !important;
+}
+
+.no-border-r {
+  border-radius: 0px !important;
 }
 
 .border-r-none {
@@ -250,9 +269,9 @@ $grey: #ced4da;
     margin-bottom: 0px;
   }
   .search-box {
-    max-height: 210px;
-    border-radius: 0 0 3px 3px;
-    margin-top: 54px;
+    max-height: 300px;
+    border-radius: 3px 3px 3px 3px;
+    margin-top: 64px;
     width: 100%;
     margin-left: 0;
     padding-bottom: 3px;
@@ -592,7 +611,7 @@ $grey: #ced4da;
   white-space: nowrap;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  padding: 20px 15px;
+  padding: 5px 15px;
 }
 
 .mobile-tabs::-webkit-scrollbar {
@@ -600,14 +619,14 @@ $grey: #ced4da;
 }
 
 .mobile-tab-item {
-  border: $green solid 1px;
-  color: $green;
+  border: $dark-green solid 1px;
+  color: $pale-light-green;
   padding: 8px 15px;
   border-radius: 100px;
 }
 
 .mobile-tab-item-active {
-  background-color: $green;
+  background-color: $dark-green;
   color: $pale-light-green;
   padding: 8px 15px;
   border-radius: 100px;

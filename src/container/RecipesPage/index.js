@@ -4,7 +4,11 @@ import RecipeCard from "./RecipeCard";
 import RecipeMenu from "./RecipeMenu";
 
 import { connect } from "react-redux";
-import { fetchRecipes } from "../../redux/ActionCreators";
+import {
+  fetchRecipes,
+  setRecipeCategory,
+  setHistory,
+} from "../../redux/ActionCreators";
 
 import { withRouter } from "react-router-dom";
 
@@ -16,26 +20,24 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = {
   fetchRecipes: (id, catArray) => fetchRecipes(id, catArray),
+  setRecipeCategory: (cat) => setRecipeCategory(cat),
+  setHistory: (history) => setHistory(history),
 };
 
 class Recipes extends Component {
-  state = {
-    recipeCategory: null,
-  };
-
-  async componentDidMount() {
-    console.log("MOUNTEDDD");
+  componentDidMount() {
+    this.props.setHistory(this.props.history);
     const recipeCatinUrlFull = this.props.history.location.search;
     const searchObj = this.searchStringToObject(recipeCatinUrlFull);
     if (searchObj.category) {
-      this.setState({ recipeCategory: searchObj.category });
+      this.props.setRecipeCategory(searchObj.category);
       this.props.fetchRecipes(
         searchObj.category,
-        await this.props.recipes.categoriesFetched
+        this.props.recipes.categoriesFetched
       );
     } else {
-      this.setState({ recipeCategory: null });
-      await this.props.fetchRecipes(null, this.props.recipes.categoriesFetched);
+      this.props.setRecipeCategory(null);
+      this.props.fetchRecipes(null, this.props.recipes.categoriesFetched);
     }
   }
 
@@ -58,16 +60,12 @@ class Recipes extends Component {
   render() {
     return (
       <>
-        <div className="grocery-container px-4">
+        <div className="grocery-container px-4 recipes-list-container">
           <div className="row">
             <RecipeMenu
-              recipeCategories={[
-                { id: 0, name: "Main Courses" },
-                { id: 1, name: "Side Dishes" },
-                { id: 2, name: "Desserts" },
-              ]}
+              recipeCategories={this.props.recipes.categories}
               handleClickMenuItem={this.handleClickMenuItem}
-              recipeCategory={this.state.recipeCategory}
+              recipeCategory={this.props.recipes.activeRecipeCategory}
               isLoading={this.props.recipes.isLoading}
             />
 

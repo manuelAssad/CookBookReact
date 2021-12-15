@@ -7,6 +7,13 @@ export const Recipes = (
     recipes: [],
     filteredRecipes: [],
     categoriesFetched: [],
+    categories: [
+      { id: 0, name: "Main Courses" },
+      { id: 1, name: "Side Dishes" },
+      { id: 2, name: "Desserts" },
+    ],
+    activeRecipeCategory: null,
+    history: {},
   },
   action
 ) => {
@@ -51,6 +58,22 @@ export const Recipes = (
       }
 
       return { ...state, filteredRecipes: filteredRecipesDraft };
+
+    case ActionTypes.SET_RECIPE_CATEGORY:
+      if (
+        document.getElementById(`mobile-tab-recipeCategories-${action.payload}`)
+      ) {
+        document
+          .getElementById(`mobile-tab-recipeCategories-${action.payload}`)
+          .scrollIntoView({
+            block: "end",
+            inline: "nearest",
+          });
+      }
+      return { ...state, activeRecipeCategory: action.payload };
+
+    case ActionTypes.SET_HISTORY:
+      return { ...state, history: action.payload };
     default:
       return state;
   }

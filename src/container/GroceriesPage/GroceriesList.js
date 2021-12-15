@@ -24,8 +24,9 @@ const GroceriesList = (props) => {
           ) : null}
         </div>
         <div className="row">
-          {props.groceryInstances.map((item, index) => {
-            if (item.grocery.category === props.category.id)
+          {props.groceryInstances
+            .filter((g) => g.grocery.category === props.category.id)
+            .map((item, index) => {
               return (
                 <div
                   className="col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0"
@@ -33,13 +34,31 @@ const GroceriesList = (props) => {
                 >
                   <div
                     className={`small-card-padding ${
-                      item.new && index + 1 === props.groceryInstances.length
-                        ? "blinking"
-                        : ""
+                      item.new ? "blinking" : ""
                     }`}
                   >
-                    <div className="card border-r-top-left">
-                      <div className="card-header border-r-top-left">
+                    <div
+                      className={`card ${
+                        props.groceryInstances.filter(
+                          (g) => g.grocery.category === props.category.id
+                        ).length === 1
+                          ? "border-r-one-item"
+                          : !index
+                          ? "border-r-top-left"
+                          : index + 1 ===
+                            props.groceryInstances.filter(
+                              (g) => g.grocery.category === props.category.id
+                            ).length
+                          ? "border-r-bottom-right"
+                          : "no-border-r"
+                      }`}
+                    >
+                      <div
+                        className={`card-header ${
+                          !index ? "border-r-top-left" : "no-border-r"
+                        }`}
+                      >
+                        {console.log("ITEMMISDDDD", item.id)}
                         <h4
                           className={`grocery-header ${
                             item.id !== undefined ? "" : "red-header"
@@ -85,7 +104,7 @@ const GroceriesList = (props) => {
                   </div>
                 </div>
               );
-          })}
+            })}
         </div>
       </div>
     </div>

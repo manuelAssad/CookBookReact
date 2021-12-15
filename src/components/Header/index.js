@@ -9,7 +9,7 @@ class Header extends Component {
       <div>
         <Navbar
           currentSection={this.props.currentSection}
-          handleSectionChange={this.props.handleSectionChange}
+          handleScrollSectionChange={this.props.handleScrollSectionChange}
         />
       </div>
     );
