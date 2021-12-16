@@ -31,6 +31,7 @@ const GroceriesList = (props) => {
                 <div
                   className="col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0"
                   key={item.id}
+                  onClick={() => alert(item.grocery.name)}
                 >
                   <div
                     className={`small-card-padding ${
