@@ -41,6 +41,48 @@ export const addGroceryInstances = (groceryInstances) => ({
   payload: groceryInstances,
 });
 
+export const crossOutGroceryInstanceInServer =
+  (groceryInstance) => (dispatch) => {
+    const newGroceryInstances = {
+      ...groceryInstance,
+      crossed: !groceryInstance.crossed,
+    };
+
+    dispatch(crossOutGroceryInstance(groceryInstance.id));
+
+    return fetch(baseUrl + `grocery-instances/${groceryInstance.id}`, {
+      method: "PUT",
+      body: JSON.stringify(newGroceryInstances),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(
+        (response) => {
+          if (response.ok) {
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
+          throw error;
+        }
+      )
+      .catch((error) => {
+        alert("Your grocery could not be crossed\nError: " + error.message);
+      });
+  };
+
+export const crossOutGroceryInstance = (id) => ({
+  type: ActionTypes.CROSS_OUT_GROCERY_INSTANCE,
+  payload: id,
+});
+
 export const fetchGroceryCategories = () => (dispatch) => {
   dispatch(groceryCategoriesLoading());
 

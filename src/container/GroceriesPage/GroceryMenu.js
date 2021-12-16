@@ -12,6 +12,7 @@ import OutsideClickHandler from "react-outside-click-handler";
 
 import SearchBar from "../../components/SearchBar";
 
+import { Fade } from "react-animation-components";
 const mapStateToProps = (state) => {
   return {
     groceries: state.groceries,
@@ -36,7 +37,10 @@ class GroceryMenu extends Component {
     };
 
     return (
-      <div className="d-none d-lg-block col-lg-4 col-xl-3 py-5 sticky-menu ">
+      <Fade
+        in
+        className="d-none d-lg-block col-lg-4 col-xl-3 py-5 sticky-menu "
+      >
         <div className="list-group">
           <OutsideClickHandler
             onOutsideClick={() => {
@@ -77,7 +81,7 @@ class GroceryMenu extends Component {
             </>
           ) : null}
         </div>
-      </div>
+      </Fade>
     );
   }
 }

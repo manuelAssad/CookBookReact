@@ -47,12 +47,15 @@ $grey: #ced4da;
       position: absolute;
       top: 100%;
       width: calc(100% + 4px);
-      margin-left: -2px;
+      margin-left: -3px;
       margin-top: -1px;
       z-index: 99;
     }
     .grocery-edit-btn:hover {
-      display: block;
+      display: block !important;
+    }
+    .card-header {
+      transition: all 1s !important;
     }
     .card-header:hover {
       background-color: $light-green;
@@ -73,6 +76,7 @@ $grey: #ced4da;
     padding-right: 2px !important;
     padding-left: 2px !important;
     padding-bottom: 4px !important;
+    transition: opacity 1s;
   }
   .card {
     background-color: $pale-light-green !important;
@@ -107,6 +111,7 @@ $grey: #ced4da;
   background-color: $pale-light-green !important;
   border-color: $light-green !important;
   white-space: nowrap;
+  transition: all 1s;
 }
 
 .card-image {
@@ -210,6 +215,7 @@ $grey: #ced4da;
   border-radius: 10px;
   background-color: $pale-light-green;
   margin-bottom: 4px;
+  z-index: -99;
 }
 
 .ingredient-search {
@@ -815,12 +821,73 @@ $grey: #ced4da;
     opacity: 1;
   }
   50% {
-    opacity: 0;
+    opacity: 1;
   }
   80% {
-    opacity: 0;
+    opacity: 1;
   }
   100% {
     opacity: 1;
+  }
+}
+// Start of card loading animation
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+.rainbow {
+  position: relative;
+  border-width: 0px !important;
+  z-index: -1;
+  border-radius: 0px;
+  overflow: hidden;
+  padding: 1px !important;
+  color: red !important;
+
+  .card {
+    border-width: 0px !important;
+    border-radius: 0px !important;
+    border-color: rgba(0, 0, 0, 0);
+  }
+
+  .card-header {
+    border-radius: 0px !important;
+    opacity: 0.3;
+    transition: all 1s;
+  }
+  .card-image {
+    opacity: 0.3;
+    transition: all 1s;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    left: -50%;
+    top: -50%;
+    width: 200%;
+    height: 200%;
+    background-color: $green;
+    background-repeat: no-repeat;
+    background-size: 50% 50%, 50% 50%;
+    background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+    background-image: linear-gradient($green, $green),
+      linear-gradient(white, white);
+    animation: rotate 4s linear infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 5px !important;
+    top: 5px !important;
+    width: calc(100% - 10px) !important;
+    height: calc(100% - 10px) !important;
+    background: white;
+    border-radius: 5px;
   }
 }

@@ -80,5 +80,29 @@ export const GroceryInstances = (
         ...state,
         groceryInstances: groceryInstancesCopy2,
       };
+
+    case ActionTypes.CROSS_OUT_GROCERY_INSTANCE:
+      const groceryInstancesCopy3 = [...state.groceryInstances];
+
+      const indexOfNewItem3 = state.groceryInstances.findIndex(
+        (item) => item.id === action.payload
+      );
+
+      const groceryInstanceToBeCrossed = groceryInstancesCopy3[indexOfNewItem3];
+      groceryInstanceToBeCrossed.crossed = !groceryInstanceToBeCrossed.crossed;
+
+      groceryInstancesCopy3.splice(indexOfNewItem3, 1);
+      groceryInstancesCopy3.splice(
+        indexOfNewItem3,
+        0,
+        groceryInstanceToBeCrossed
+      );
+
+      console.log(groceryInstancesCopy3, "NEWWWWWWWWWW");
+
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopy3,
+      };
   }
 };
