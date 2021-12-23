@@ -78,9 +78,7 @@ $grey: #ced4da;
     padding-bottom: 4px !important;
     transition: opacity 1s;
   }
-  .card {
-    background-color: $pale-light-green !important;
-  }
+
   // .card:hover{
   //     background-color: $light-green;
   //     .card-header{
@@ -95,12 +93,6 @@ $grey: #ced4da;
     width: 100%;
     background-color: rgba(0, 0, 0, 0);
     z-index: 99;
-  }
-
-  .mobile-card-clickable-sec:hover {
-    background-color: $green;
-    opacity: 0.4;
-    height: 100%;
   }
 }
 
@@ -638,7 +630,7 @@ $grey: #ced4da;
   border-radius: 100px;
 }
 
-.recipe-modal-image {
+.recipe-modal-image.recipe-modal-image {
   position: relative;
   z-index: 1;
   height: 210px;
@@ -784,6 +776,7 @@ $grey: #ced4da;
     border: $green 1px solid;
     border-top-right-radius: 8px;
     border-top-left-radius: 8px;
+    color: $dark-green;
   }
   .nav-item .active {
     background-color: $green;
@@ -792,6 +785,7 @@ $grey: #ced4da;
   .nav-link {
     padding-bottom: 10px;
     overflow: hidden;
+    cursor: pointer;
   }
 }
 
@@ -840,17 +834,15 @@ $grey: #ced4da;
 
 .rainbow {
   position: relative;
-  border-width: 0px !important;
   z-index: -1;
-  border-radius: 0px;
+  border-radius: 5px !important;
   overflow: hidden;
-  padding: 1px !important;
+  padding: 2px !important;
   color: red !important;
 
   .card {
-    border-width: 0px !important;
     border-radius: 0px !important;
-    border-color: rgba(0, 0, 0, 0);
+    border: none;
   }
 
   .card-header {
@@ -858,6 +850,7 @@ $grey: #ced4da;
     opacity: 0.3;
     transition: all 1s;
   }
+
   .card-image {
     opacity: 0.3;
     transition: all 1s;
@@ -890,4 +883,93 @@ $grey: #ced4da;
     background: white;
     border-radius: 5px;
   }
+}
+
+//end styling
+
+@keyframes strike {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes strike-remove {
+  0% {
+    width: 100%;
+  }
+  100% {
+    width: 0%;
+  }
+}
+.strike,
+.strike-remove {
+  position: relative;
+}
+.strike::after,
+.strike-remove::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0%;
+
+  height: 1px;
+  background: red;
+
+  animation-name: strike;
+  animation-duration: 0.6s;
+  animation-timing-function: linear;
+  animation-iteration-count: 1;
+  animation-fill-mode: forwards;
+}
+.strike-remove::after {
+  animation-name: strike-remove;
+}
+
+.item-striked {
+  text-decoration-color: red !important;
+  text-decoration: line-through;
+}
+.striked-out,
+.striked-out:hover {
+  border-color: rgba(0, 0, 0, 0.3) !important;
+  border-width: 1px;
+
+  .grocery-edit-btn {
+    display: none !important;
+  }
+
+  .card-header {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+  }
+  .grocery-header,
+  .grocery-header:hover {
+    color: rgba(0, 0, 0, 0.3) !important;
+    text-decoration: none;
+  }
+  .card-image {
+    opacity: 0.5;
+  }
+
+  .grocery-note {
+    display: none !important;
+  }
+}
+
+// .cardAnimation-exit {
+//   opacity: 0;
+//   transition: opacity 400ms ease-out;
+// }
+.cardAnimation-exit-active {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 400ms ease-out;
+}
+
+.cardAnimation-enter-active {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 400ms ease-out;
 }

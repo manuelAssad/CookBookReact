@@ -1,8 +1,11 @@
 import React, { Component } from "react";
 
-const RecipeCard = ({ ...recipe }) => {
+const RecipeCard = ({ recipe, handleRecipeClick }) => {
   return (
-    <div className="col-xl-4 col-md-6 col-12 p-2  hvr-grow">
+    <div
+      className="col-xl-4 col-md-6 col-12 p-2  hvr-grow"
+      onClick={() => handleRecipeClick(recipe.id)}
+    >
       <div className="recipe-card-container">
         <div className="d-flex recipe-owner">
           <div

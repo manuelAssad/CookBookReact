@@ -9,6 +9,7 @@ export const GroceryInstances = (
     errMess: null,
     groceryInstances: [],
     refObj: {},
+    shouldRefetch: false,
   },
   action
 ) => {
@@ -20,7 +21,8 @@ export const GroceryInstances = (
       refObjCopy.c2 = React.createRef();
       refObjCopy.c3 = React.createRef();
       refObjCopy.c4 = React.createRef();
-
+      refObjCopy.c5 = React.createRef();
+      refObjCopy.c6 = React.createRef();
       return {
         ...state,
         refObj: refObjCopy,
@@ -57,7 +59,7 @@ export const GroceryInstances = (
       window.scrollTo(
         0,
         scrollData.offsetTop +
-          (scrollData.offsetHeight - window.innerHeight * 0.65)
+          (scrollData.offsetHeight - window.innerHeight * 0.4)
       );
 
       return {
@@ -97,12 +99,32 @@ export const GroceryInstances = (
         0,
         groceryInstanceToBeCrossed
       );
-
-      console.log(groceryInstancesCopy3, "NEWWWWWWWWWW");
-
       return {
         ...state,
         groceryInstances: groceryInstancesCopy3,
+      };
+
+    case ActionTypes.DELETE_GROCERY_INSTANCE:
+      const groceryInstancesCopy4 = [...state.groceryInstances];
+      const indexOfNewItem4 = state.groceryInstances.findIndex(
+        (item) => item.id === action.payload
+      );
+
+      groceryInstancesCopy4.splice(indexOfNewItem4, 1);
+      console.log(
+        "DELETEEEEEE",
+        indexOfNewItem4,
+        groceryInstancesCopy4[indexOfNewItem4]
+      );
+
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopy4,
+      };
+    case ActionTypes.GROCERY_INSTANCES_REFETCH:
+      return {
+        ...state,
+        shouldRefetch: true,
       };
   }
 };

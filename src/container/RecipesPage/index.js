@@ -12,6 +12,12 @@ import {
 
 import { withRouter } from "react-router-dom";
 
+import ContentLoader from "react-content-loader";
+
+import RecipeDetailsModal from "./RecipeDetailsModal";
+
+import { fetchRecipeDetails } from "../../redux/ActionCreators";
+
 const mapStateToProps = (state) => {
   return {
     recipes: state.recipes,
@@ -22,9 +28,18 @@ const mapDispatchToProps = {
   fetchRecipes: (id, catArray) => fetchRecipes(id, catArray),
   setRecipeCategory: (cat) => setRecipeCategory(cat),
   setHistory: (history) => setHistory(history),
+  fetchRecipeDetails: (id) => fetchRecipeDetails(id),
 };
 
 class Recipes extends Component {
+  state = {
+    placeholderArray: [
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+      21, 22, 23,
+    ],
+    detailsModalOpen: false,
+    recipeOpen: {},
+  };
   componentDidMount() {
     this.props.setHistory(this.props.history);
     const recipeCatinUrlFull = this.props.history.location.search;
@@ -57,512 +72,122 @@ class Recipes extends Component {
     this.props.history.push(`/recipes${id === null ? "" : `?category=${id}`}`);
   };
 
+  handleRecipeClick = (recipe) => {
+    this.props.fetchRecipeDetails(recipe.id);
+    this.setState({
+      detailsModalOpen: true,
+      recipeOpen: recipe,
+    });
+  };
+
   render() {
     return (
       <>
+        <RecipeDetailsModal
+          modalOpen={this.state.detailsModalOpen}
+          toggle={() =>
+            this.setState({ detailsModalOpen: !this.state.detailsModalOpen })
+          }
+          recipeOpen={this.state.recipeOpen}
+        />
         <div className="grocery-container px-4 recipes-list-container">
           <div className="row">
-            <RecipeMenu
-              recipeCategories={this.props.recipes.categories}
-              handleClickMenuItem={this.handleClickMenuItem}
-              recipeCategory={this.props.recipes.activeRecipeCategory}
-              isLoading={this.props.recipes.isLoading}
-            />
+            {this.props.recipes.isLoading &&
+            !this.props.recipes.categoriesFetched.length ? (
+              <>
+                <ContentLoader
+                  height={500}
+                  width={400}
+                  speed={2}
+                  backgroundColor={"#f0f2f5"}
+                  foregroundColor={"white"}
+                  className="d-none d-lg-block sticky-menu"
+                >
+                  {/* menu */}
+                  <rect x="3" y="131" rx="5" ry="5" width="320" height="45" />
+                  <rect x="3" y="180" rx="5" ry="5" width="320" height="45" />
+                  <rect x="3" y="230" rx="5" ry="5" width="320" height="45" />
+                  <rect x="3" y="280" rx="5" ry="5" width="320" height="45" />
 
-            <div id="addRecipeModal" className="modal fade" role="dialog">
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header  lightgreen-bg">
-                    <h3 className="modal-title ml-auto pl-4">
-                      Create New Recipe
-                    </h3>
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="container-fluid">
-                      <div className="row justify-content-center">
-                        <div className="col-12 mb-4">
-                          <img
-                            src="https://delo-vcusa.ru/lazy-load-placeholder.png"
-                            className="recipe-modal-image img-fluid img-thumbnail"
-                            alt="responsive image"
-                          />
-                          <div className="add-recipe-photo-text">Add photo</div>
-                        </div>
-                        <div className="col-12 mt-3">
-                          <form>
-                            <div className="form-row">
-                              <div className="col-12">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="recipeName"
-                                  placeholder="Recipe name"
-                                />
-                              </div>
-                            </div>
-
-                            <div className="form-row mt-3 row">
-                              <div className="col-md-6">
-                                <select
-                                  className="form-control mr-2 ml-md-0"
-                                  id="categorySelect"
-                                >
-                                  <option>Select Category...</option>
-                                  <option>Main Course</option>
-                                  <option>Side Dish</option>
-                                  <option>Dessert</option>
-                                  <option>Other</option>
-                                </select>
-                              </div>
-
-                              <div className="col-12 col-md-6 d-flex align-self-start mt-3 mt-md-0">
-                                <div className="text-center my-auto ml-md-auto">
-                                  Servings:
-                                </div>
-                                <div
-                                  className="btn-group ml-md-auto"
-                                  role="group"
-                                  aria-label="Basic example"
-                                >
-                                  <div className="align-self-center mr-3 ml-3">
-                                    1
-                                  </div>
-                                  <button
-                                    type="button"
-                                    className="btn border-r-left servings-button"
-                                  >
-                                    +
-                                  </button>
-                                  <button
-                                    type="button"
-                                    className="btn border-r-right servings-button"
-                                  >
-                                    -
-                                  </button>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="form-row mt-3">
-                              <div className="col-md-6 d-flex">
-                                <span className="my-auto">Cook Time:</span>
-                                <input
-                                  type="text"
-                                  className="form-control ml-2 cook-time-input small-inputs-margin-1"
-                                  id="recipeName"
-                                  placeholder=""
-                                />
-                                <span className="my-auto ml-2">min</span>
-                              </div>
-
-                              <div className="col-md-6 d-flex mt-2 mt-md-0">
-                                <span className="my-auto ml-md-auto">
-                                  Prep Time:
-                                </span>
-                                <input
-                                  type="text"
-                                  className="form-control ml-2 cook-time-input small-inputs-margin-2"
-                                  id="recipeName"
-                                  placeholder=""
-                                />
-                                <span className="my-auto ml-2">min</span>
-                              </div>
-                            </div>
-
-                            <div className="form-row mt-3">
-                              <div className="col-12 col-md-6">
-                                <button
-                                  type="button"
-                                  className="btn add-recipe-modal-btn w-100 hvr-grow"
-                                  data-target="#addIngredientModal"
-                                  data-dismiss="modal"
-                                  data-toggle="modal"
-                                >
-                                  Add Ingredients
-                                </button>
-                              </div>
-                              <div className="col-12 col-md-6 mt-2 mt-md-0">
-                                <button
-                                  type="button"
-                                  className="btn add-recipe-modal-btn w-100 hvr-grow"
-                                  data-dismiss="modal"
-                                  data-toggle="modal"
-                                  data-target="#addStepModal"
-                                >
-                                  {" "}
-                                  Add Preparation Steps
-                                </button>
-                              </div>
-                            </div>
-
-                            <div className="form-row mt-5">
-                              <div className="col-6">
-                                <button
-                                  type="button"
-                                  className="btn grocery-modal-button-1 hvr-grow"
-                                >
-                                  SAVE
-                                </button>
-                              </div>
-                              <div className="col-6">
-                                <button
-                                  type="submit"
-                                  className="btn grocery-modal-button-2 hvr-grow"
-                                  data-dismiss="modal"
-                                >
-                                  CANCEL
-                                </button>
-                              </div>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div id="addIngredientModal" className="modal fade" role="dialog">
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header  lightgreen-bg">
-                    <h3 className="modal-title ml-auto pl-4">Add Ingredient</h3>
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                      data-target="#addRecipeModal"
-                      data-toggle="modal"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="container-fluid">
-                      <div className="row justify-content-center">
-                        <div className="col-12 mt-3">
-                          <form>
-                            <div className="form-row">
-                              <div className="col-12">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="recipeName"
-                                  placeholder="Ingredient Name"
-                                />
-                              </div>
-                              <div className="col-12 mt-3">
-                                <label for="recipeNote">
-                                  Note (quantity, description):
-                                </label>
-                                <textarea
-                                  id="recipeNote"
-                                  type="text"
-                                  className="form-control"
-                                  id="recipeName"
-                                ></textarea>
-                              </div>
-                            </div>
-
-                            <div className="form-row mt-5">
-                              <div className="col-6">
-                                <button
-                                  type="button"
-                                  className="btn grocery-modal-button-1"
-                                  data-toggle="modal"
-                                  data-dismiss="modal"
-                                  data-target="#ingredientsListModal"
-                                >
-                                  ADD INGREDIENT
-                                </button>
-                              </div>
-                              <div className="col-6">
-                                <button
-                                  type="submit"
-                                  className="btn grocery-modal-button-2"
-                                  data-dismiss="modal"
-                                  data-toggle="modal"
-                                  data-target="#addRecipeModal"
-                                >
-                                  CANCEL
-                                </button>
-                              </div>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div id="ingredientsListModal" className="modal fade" role="dialog">
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header  lightgreen-bg">
-                    <h3 className="modal-title ml-auto pl-4">
-                      Ingredients List
-                    </h3>
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                      data-toggle="modal"
-                      data-target="#addRecipeModal"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="container-fluid">
-                      <div className="row">
-                        <div className="col-12 mt-3 igredients-list-item">
-                          <div className="row">
-                            <div className="col">
-                              <i
-                                className="fa fa-edit hvr-grow"
-                                data-dismiss="modal"
-                                data-toggle="modal"
-                                data-target="#addIngredientModal"
-                              ></i>
-                              <span className="ml-2">Bread -</span>
-                              <small className="ingredient-list-item-note">
-                                5 packs
-                              </small>
-                            </div>
-                            <div className="d-flex pr-4">
-                              <div className="ml-auto">
-                                <span className="edit-ingredient-item">
-                                  {" "}
-                                  <i className="fa fa-trash hvr-grow"></i>
-                                </span>
-                                <span>
-                                  <i className="fa fa-bars hvr-grow ml-1"></i>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-12 mt-1 igredients-list-item">
-                          <div className="row">
-                            <div className="col">
-                              <i className="fa fa-edit hvr-grow"></i>
-                              <span className="ml-2">Bread -</span>
-                              <small className="ingredient-list-item-note">
-                                5 packs
-                              </small>
-                            </div>
-                            <div className="d-flex pr-4">
-                              <div className="ml-auto">
-                                <span className="edit-ingredient-item">
-                                  {" "}
-                                  <i className="fa fa-trash hvr-grow"></i>
-                                </span>
-                                <span>
-                                  <i className="fa fa-bars hvr-grow ml-1"></i>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <button
-                          className="btn w-100 mt-4 add-recipe-modal-btn"
-                          data-dismiss="modal"
-                          data-toggle="modal"
-                          data-target="#addIngredientModal"
-                        >
-                          Add Ingredient
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div id="addStepModal" className="modal fade" role="dialog">
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header  lightgreen-bg">
-                    <h3 className="modal-title ml-auto pl-4">
-                      Add Preparation Step
-                    </h3>
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                      data-target="#addRecipeModal"
-                      data-toggle="modal"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="container-fluid">
-                      <div className="row justify-content-center">
-                        <div className="col-12 mt-3">
-                          <form>
-                            <div className="form-row">
-                              <div className="col-12">
-                                <input
-                                  type="text"
-                                  className="form-control"
-                                  id="stepTitle"
-                                  placeholder="Step Title"
-                                />
-                              </div>
-                              <div className="col-12 mt-3">
-                                <label for="stepDescription">
-                                  Step Description:
-                                </label>
-                                <textarea
-                                  id="stepDescription"
-                                  type="text"
-                                  className="form-control"
-                                ></textarea>
-                              </div>
-                            </div>
-
-                            <div className="form-row mt-5">
-                              <div className="col-6">
-                                <button
-                                  type="button"
-                                  className="btn grocery-modal-button-1"
-                                  data-toggle="modal"
-                                  data-dismiss="modal"
-                                  data-target="#stepsListModal"
-                                >
-                                  ADD STEP
-                                </button>
-                              </div>
-                              <div className="col-6">
-                                <button
-                                  type="submit"
-                                  className="btn grocery-modal-button-2"
-                                  data-dismiss="modal"
-                                  data-toggle="modal"
-                                  data-target="#addRecipeModal"
-                                >
-                                  CANCEL
-                                </button>
-                              </div>
-                            </div>
-                          </form>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div id="stepsListModal" className="modal fade" role="dialog">
-              <div className="modal-dialog" role="document">
-                <div className="modal-content">
-                  <div className="modal-header  lightgreen-bg">
-                    <h3 className="modal-title ml-auto pl-4">
-                      Preparation Steps List
-                    </h3>
-                    <button
-                      type="button"
-                      className="close"
-                      data-dismiss="modal"
-                      data-toggle="modal"
-                      data-target="#addRecipeModal"
-                    >
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <div className="container-fluid">
-                      <div className="row">
-                        <div className="col-12 mt-3 igredients-list-item">
-                          <div className="row">
-                            <div className="col">
-                              <i
-                                className="fa fa-edit hvr-grow"
-                                data-dismiss="modal"
-                                data-toggle="modal"
-                                data-target="#addStepModal"
-                              ></i>
-                              <span className="ml-2">Boil Water</span>
-                            </div>
-                            <div className="d-flex pr-4">
-                              <div className="ml-auto">
-                                <span className="edit-ingredient-item">
-                                  {" "}
-                                  <i className="fa fa-trash hvr-grow"></i>
-                                </span>
-                                <span>
-                                  <i className="fa fa-bars hvr-grow ml-1"></i>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <div className="col-12 mt-1 igredients-list-item">
-                          <div className="row">
-                            <div className="col">
-                              <i className="fa fa-edit hvr-grow"></i>
-                              <span className="ml-2">Boil Water</span>
-                            </div>
-                            <div className="d-flex pr-4">
-                              <div className="ml-auto">
-                                <span className="edit-ingredient-item">
-                                  {" "}
-                                  <i className="fa fa-trash hvr-grow"></i>
-                                </span>
-                                <span>
-                                  <i className="fa fa-bars hvr-grow ml-1"></i>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="row">
-                        <button
-                          className="btn w-100 mt-4 add-recipe-modal-btn hvr-grow"
-                          data-dismiss="modal"
-                          data-toggle="modal"
-                          data-target="#addStepModal"
-                        >
-                          Add Preparation Step
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                  {/* searchbar */}
+                  <rect x="261" y="58" rx="5" ry="5" width="60" height="45" />
+                  <rect x="46" y="58" rx="5" ry="5" width="210" height="45" />
+                  <rect x="3" y="58" rx="5" ry="5" width="38" height="45" />
+                </ContentLoader>
+              </>
+            ) : (
+              <RecipeMenu
+                recipeCategories={this.props.recipes.categories}
+                handleClickMenuItem={this.handleClickMenuItem}
+                recipeCategory={this.props.recipes.activeRecipeCategory}
+                isLoading={this.props.recipes.isLoading}
+              />
+            )}
 
             <div className="col-md-12 col-lg-7 col-xl-8 offset-xl-3 offset-lg-4 pt-lg-5 pl-lg-5">
               {this.props.recipes.isLoading ? (
-                <div>Loading..</div>
+                <>
+                  {this.state.placeholderArray.map((placeholder) => {
+                    return (
+                      <ContentLoader
+                        speed={2}
+                        width={"100%"}
+                        height={200}
+                        backgroundColor="#f3f3f3"
+                        foregroundColor="#ecebeb"
+                        className="col-xl-4 col-md-6 col-12 d-inline-block"
+                      >
+                        <rect
+                          x="48"
+                          y="8"
+                          rx="3"
+                          ry="3"
+                          width="88"
+                          height="6"
+                        />
+                        <rect
+                          x="48"
+                          y="26"
+                          rx="3"
+                          ry="3"
+                          width="52"
+                          height="6"
+                        />
+                        <circle cx="20" cy="20" r="20" />
+                        <rect
+                          x="196"
+                          y="7"
+                          rx="3"
+                          ry="3"
+                          width="52"
+                          height="6"
+                        />
+                        <rect
+                          x="5"
+                          y="51"
+                          rx="0"
+                          ry="0"
+                          width="100%"
+                          height="60%"
+                        />
+                      </ContentLoader>
+                    );
+                  })}
+                </>
               ) : (
                 <div className="tab-content">
                   <div className="tab-pane fade show active">
                     <div className="row overflow-hidden">
                       {this.props.recipes.filteredRecipes.map((recipe) => {
-                        return <RecipeCard key={recipe.id} {...recipe} />;
+                        return (
+                          <RecipeCard
+                            handleRecipeClick={() =>
+                              this.handleRecipeClick(recipe)
+                            }
+                            key={recipe.id}
+                            recipe={recipe}
+                          />
+                        );
                       })}
                     </div>
                   </div>

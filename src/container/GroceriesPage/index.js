@@ -14,6 +14,8 @@ import { Fade } from "react-animation-components";
 import {
   handleSectionChange,
   crossOutGroceryInstanceInServer,
+  deleteGroceryInstance,
+  fetchGroceryInstances,
 } from "../../redux/ActionCreators";
 
 import { connect } from "react-redux";
@@ -21,12 +23,17 @@ import { connect } from "react-redux";
 import VisibilitySensor from "react-visibility-sensor";
 
 const mapStateToProps = (state) => {
-  return { groceryCategories: state.groceryCategories };
+  return {
+    groceryCategories: state.groceryCategories,
+    shouldRefetch: state.recipes.shouldRefetch,
+  };
 };
 
 const mapDispatchToProps = {
   handleSectionChange: (i) => handleSectionChange(i),
   crossOutGroceryInstanceInServer: (id) => crossOutGroceryInstanceInServer(id),
+  deleteGroceryInstance: (id) => deleteGroceryInstance(id),
+  fetchGroceryInstances: () => fetchGroceryInstances(),
 };
 
 class Groceries extends Component {
@@ -40,6 +47,12 @@ class Groceries extends Component {
     };
   }
 
+  componentDidMount() {
+    console.log("SHOULDREFETCHONMOUNT", this.props.shouldRefetch);
+    if (this.props.shouldRefetch) {
+      this.props.fetchGroceryInstances();
+    }
+  }
   render() {
     const handleSectionVisible = (v, cat) => {
       if (v) {
@@ -149,7 +162,13 @@ class Groceries extends Component {
                       (category) => {
                         return (
                           <VisibilitySensor
+                            key={category.id}
                             onChange={(v) => handleSectionVisible(v, category)}
+                            partialVisibility={true}
+                            offset={{
+                              top: window.innerHeight * 0.5,
+                              bottom: window.innerHeight * 0.5,
+                            }}
                           >
                             <GroceriesList
                               className="rainbow"
@@ -163,6 +182,9 @@ class Groceries extends Component {
                               refObj={this.props.refObj}
                               crossOutGroceryInstanceInServer={
                                 this.props.crossOutGroceryInstanceInServer
+                              }
+                              deleteGroceryInstance={
+                                this.props.deleteGroceryInstance
                               }
                             />
                           </VisibilitySensor>

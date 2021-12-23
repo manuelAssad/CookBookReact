@@ -2,6 +2,7 @@ import * as ActionTypes from "./ActionTypes";
 import { baseUrl } from "../shared/baseUrl";
 
 export const fetchGroceryInstances = () => (dispatch) => {
+  dispatch(unSetShouldRefetch());
   dispatch(groceryInstancesLoading());
 
   return fetch(baseUrl + "grocery-instances")
@@ -82,6 +83,41 @@ export const crossOutGroceryInstance = (id) => ({
   type: ActionTypes.CROSS_OUT_GROCERY_INSTANCE,
   payload: id,
 });
+
+export const removeGroceryInstance = (id) => ({
+  type: ActionTypes.DELETE_GROCERY_INSTANCE,
+  payload: id,
+});
+
+export const deleteGroceryInstance = (id) => (dispatch) => {
+  dispatch(removeGroceryInstance(id));
+
+  return fetch(baseUrl + `grocery-instances/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .catch((error) => {
+      alert("Your grocery could not be crossed\nError: " + error.message);
+    });
+};
 
 export const fetchGroceryCategories = () => (dispatch) => {
   dispatch(groceryCategoriesLoading());
@@ -169,6 +205,152 @@ export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
       .catch((error) => dispatch(recipesFailed(error.message)));
   }
 };
+
+export const fetchRecipeDetails = (id) => (dispatch) => {
+  dispatch(fetchRecipeIngredients(id));
+  dispatch(fetchRecipeSteps(id));
+};
+
+export const fetchRecipeIngredients = (id) => (dispatch) => {
+  dispatch(recipeIngredientsLoading());
+  return fetch(baseUrl + `recipe-ingredients?recipe=${id}`)
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        const errMess = new Error(error.message);
+        throw errMess;
+      }
+    )
+    .then((response) => response.json())
+    .then((ingredients) => dispatch(addRecipeIngredients(ingredients)))
+    .catch((error) => dispatch(recipeIngredientsFailed(error.message)));
+};
+
+export const fetchRecipeSteps = (id) => (dispatch) => {
+  dispatch(recipeStepsLoading());
+  return fetch(baseUrl + `recipe-steps?recipe=${id}`)
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        const errMess = new Error(error.message);
+        throw errMess;
+      }
+    )
+    .then((response) => response.json())
+    .then((steps) => dispatch(addRecipeSteps(steps)))
+    .catch((error) => dispatch(recipeStepsFailed(error.message)));
+};
+
+export const recipeIngredientsLoading = () => ({
+  type: ActionTypes.RECIPE_INGREDIENTS_LOADING,
+});
+
+export const recipeIngredientsFailed = () => ({
+  type: ActionTypes.RECIPE_INGREDIENTS_FAILED,
+});
+
+export const addRecipeIngredients = (ingredients) => ({
+  type: ActionTypes.ADD_RECIPE_INGREDIENTS,
+  payload: ingredients,
+});
+
+export const recipeStepsLoading = () => ({
+  type: ActionTypes.RECIPE_STEPS_LOADING,
+});
+
+export const recipeStepsFailed = () => ({
+  type: ActionTypes.RECIPE_STEPS_FAILED,
+});
+
+export const addRecipeSteps = (steps) => ({
+  type: ActionTypes.ADD_RECIPE_STEPS,
+  payload: steps,
+});
+
+export const addIngredientToList = (ingredient) => (dispatch) => {
+  dispatch(shouldAddIngredientToList(ingredient.id));
+
+  const newGrocery = {
+    grocery: ingredient.grocery,
+    custom_image: null,
+    detail: ingredient.detail,
+    user: 0,
+    timestamp: Date.now(),
+  };
+  return fetch(baseUrl + "grocery-instances", {
+    method: "POST",
+    body: JSON.stringify(newGrocery),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => {
+      dispatch(addIngredientsProcedure(ingredient.id));
+    })
+    .catch((error) => {
+      dispatch(failedAddIngredientToList(ingredient.id));
+    });
+};
+
+export const shouldAddIngredientToList = (id) => ({
+  type: ActionTypes.SHOULD_ADD_INGREDIENT_TO_LIST,
+  payload: id,
+});
+
+export const addIngredientsProcedure = (id) => (dispatch) => {
+  dispatch(successfullyAddIngredientToList(id));
+};
+
+export const successfullyAddIngredientToList = (id) => ({
+  type: ActionTypes.SUCCESSFULLY_ADDED_INGREDIENT_TO_LIST,
+  payload: id,
+});
+
+export const unSetShouldRefetch = () => ({
+  type: ActionTypes.UNSET_REFETCH,
+});
+
+export const failedAddIngredientToList = (id) => ({
+  type: ActionTypes.FAILED_ADDING_INGREDIENT_TO_LIST,
+  payload: id,
+});
 
 export const filterRecipes = (id) => ({
   type: ActionTypes.FILTER_RECIPES,

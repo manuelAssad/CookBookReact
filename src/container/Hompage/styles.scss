@@ -243,3 +243,23 @@ div.green-border {
     border-bottom: 0px;
   }
 }
+
+.modal-title.modal-title {
+  margin: auto;
+}
+
+#recipeModalTabs {
+  .nav-item a {
+    border: $green 1px solid !important;
+    border-top-right-radius: 8px !important;
+    border-top-left-radius: 8px !important;
+  }
+  .nav-item .active {
+    background-color: $green !important;
+    color: $pale-light-green !important;
+  }
+  .nav-link {
+    padding-bottom: 10px !important;
+    overflow: hidden !important;
+  }
+}
