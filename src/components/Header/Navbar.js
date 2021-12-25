@@ -169,7 +169,8 @@ const NavbarComponent = (props) => {
             <SearchBar />
           ) : null}
 
-          {pageName === "groceries" ? (
+          {pageName === "groceries" &&
+          !groceryInstances.groceryInstanceToFilter ? (
             <MobileTabs
               key={pageName}
               data={mobileTabsData}
@@ -179,7 +180,8 @@ const NavbarComponent = (props) => {
               }
               groupName={"groceryCategories"}
             />
-          ) : pageName === "recipes" ? (
+          ) : pageName === "recipes" &&
+            !groceryInstances.groceryInstanceToFilter ? (
             <MobileTabs
               key={pageName}
               data={recipes.categories}

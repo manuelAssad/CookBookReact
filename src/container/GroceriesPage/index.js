@@ -16,6 +16,7 @@ import {
   crossOutGroceryInstanceInServer,
   deleteGroceryInstance,
   fetchGroceryInstances,
+  viewAllGroceryInstances,
 } from "../../redux/ActionCreators";
 
 import { connect } from "react-redux";
@@ -26,6 +27,8 @@ const mapStateToProps = (state) => {
   return {
     groceryCategories: state.groceryCategories,
     shouldRefetch: state.recipes.shouldRefetch,
+    groceryInstanceToFilter: state.groceryInstances.groceryInstanceToFilter,
+    filteredGroceryInstances: state.groceryInstances.filteredGroceryInstances,
   };
 };
 
@@ -34,6 +37,7 @@ const mapDispatchToProps = {
   crossOutGroceryInstanceInServer: (id) => crossOutGroceryInstanceInServer(id),
   deleteGroceryInstance: (id) => deleteGroceryInstance(id),
   fetchGroceryInstances: () => fetchGroceryInstances(),
+  viewAllGroceryInstances: (grocery) => viewAllGroceryInstances(grocery),
 };
 
 class Groceries extends Component {
@@ -62,7 +66,11 @@ class Groceries extends Component {
     };
     return (
       <Fade in>
-        <div className="grocery-container px-4 mt-5">
+        <div
+          className={`grocery-container px-4 ${
+            this.props.groceryInstanceToFilter ? "mt-3" : "mt-5"
+          }`}
+        >
           <div className="row">
             {this.props.groceryCategories.isLoading ? (
               <>
@@ -97,6 +105,7 @@ class Groceries extends Component {
                 groceriesLoading={this.props.groceriesLoading}
                 groceriesErrMess={this.props.groceriesErrMess}
                 groceryInstances={this.props.groceryInstances}
+                groceryInstanceToFilter={this.props.groceryInstanceToFilter}
               />
             )}
             <div className="col-md-12 col-lg-7 col-xl-8 offset-xl-3 offset-lg-4 pt-lg-5 pl-lg-5 groceries-list-container">
@@ -155,8 +164,21 @@ class Groceries extends Component {
                   </>
                 ) : (
                   <Fade in>
-                    {!this.props.groceryInstances.length ? (
-                      <div>Add your first grocery from the searchbar</div>
+                    {this.props.groceryInstanceToFilter ? (
+                      <div className="d-flex">
+                        Filtering:{" "}
+                        <span className="ml-2">
+                          {this.props.groceryInstanceToFilter.name}
+                        </span>
+                        <div
+                          className="clear-filter-button"
+                          onClick={() =>
+                            this.props.viewAllGroceryInstances(null)
+                          }
+                        >
+                          Clear Filter
+                        </div>
+                      </div>
                     ) : null}
                     {this.props.groceryCategories.groceryCategories.map(
                       (category) => {
@@ -170,23 +192,35 @@ class Groceries extends Component {
                               bottom: window.innerHeight * 0.5,
                             }}
                           >
-                            <GroceriesList
-                              className="rainbow"
-                              hasItems={
-                                this.props.groceryInstances.filter(
-                                  (g) => g.grocery.category === category.id
-                                ).length
-                              }
-                              category={category}
-                              groceryInstances={this.props.groceryInstances}
-                              refObj={this.props.refObj}
-                              crossOutGroceryInstanceInServer={
-                                this.props.crossOutGroceryInstanceInServer
-                              }
-                              deleteGroceryInstance={
-                                this.props.deleteGroceryInstance
-                              }
-                            />
+                            <>
+                              <GroceriesList
+                                className="rainbow"
+                                groceryInstanceToFilter={
+                                  this.props.groceryInstanceToFilter
+                                }
+                                hasItems={
+                                  this.props.groceryInstanceToFilter
+                                    ? false
+                                    : this.props.groceryInstances.filter(
+                                        (g) =>
+                                          g.grocery.category === category.id
+                                      ).length
+                                }
+                                category={category}
+                                groceryInstances={
+                                  this.props.groceryInstanceToFilter
+                                    ? this.props.filteredGroceryInstances
+                                    : this.props.groceryInstances
+                                }
+                                refObj={this.props.refObj}
+                                crossOutGroceryInstanceInServer={
+                                  this.props.crossOutGroceryInstanceInServer
+                                }
+                                deleteGroceryInstance={
+                                  this.props.deleteGroceryInstance
+                                }
+                              />
+                            </>
                           </VisibilitySensor>
                         );
                       }

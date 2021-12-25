@@ -6,6 +6,7 @@ import {
   setSearchActive,
   filterGroceries,
   handleClickCategory,
+  viewAllGroceryInstances,
 } from "../../redux/ActionCreators";
 
 import OutsideClickHandler from "react-outside-click-handler";
@@ -25,6 +26,7 @@ const mapDispatchToProps = {
   setSearchActive: (value) => setSearchActive(value),
   filterGroceries: (value) => filterGroceries(value),
   handleClickCategory: (id, ref) => handleClickCategory(id, ref),
+  viewAllGroceryInstances: (grocery) => viewAllGroceryInstances(grocery),
 };
 
 class GroceryMenu extends Component {
@@ -51,34 +53,51 @@ class GroceryMenu extends Component {
           </OutsideClickHandler>
 
           {!this.props.groceries.searchActive ? (
-            <>
-              {this.props.groceryCategories.groceryCategories.map((cat, i) => {
-                return (
-                  <>
-                    {this.props.groceryInstances.groceryInstances.filter(
-                      (g) => g.grocery.category === cat.id
-                    ).length ? (
-                      <a
-                        key={cat.id}
-                        className={`list-group-item list-group-item-action ${
-                          this.props.groceryCategories.activeCat === cat.id
-                            ? "active"
-                            : ""
-                        }`}
-                        onClick={() =>
-                          this.props.handleClickCategory(
-                            cat.id,
-                            this.props.groceryInstances.refObj
-                          )
-                        }
-                      >
-                        {cat.name}
-                      </a>
-                    ) : null}
-                  </>
-                );
-              })}
-            </>
+            this.props.groceryInstanceToFilter ? (
+              <div className="d-flex">
+                Filtering:{" "}
+                <span className="ml-2">
+                  {this.props.groceryInstanceToFilter.name}
+                </span>
+                <div
+                  className="clear-filter-button"
+                  onClick={() => this.props.viewAllGroceryInstances(null)}
+                >
+                  Clear Filter
+                </div>
+              </div>
+            ) : (
+              <>
+                {this.props.groceryCategories.groceryCategories.map(
+                  (cat, i) => {
+                    return (
+                      <>
+                        {this.props.groceryInstances.groceryInstances.filter(
+                          (g) => g.grocery.category === cat.id
+                        ).length ? (
+                          <a
+                            key={cat.id}
+                            className={`list-group-item list-group-item-action ${
+                              this.props.groceryCategories.activeCat === cat.id
+                                ? "active"
+                                : ""
+                            }`}
+                            onClick={() =>
+                              this.props.handleClickCategory(
+                                cat.id,
+                                this.props.groceryInstances.refObj
+                              )
+                            }
+                          >
+                            {cat.name}
+                          </a>
+                        ) : null}
+                      </>
+                    );
+                  }
+                )}
+              </>
+            )
           ) : null}
         </div>
       </Fade>

@@ -24,7 +24,7 @@ import AccordionComponent from "../../components/AccordionComponent";
 import ContentLoader from "react-content-loader";
 
 import CheckMarkLottie from "./CheckMarkLottie";
-import SpinnerLottie from "./Spinner";
+import SpinnerLottie from "../../components/Spinner";
 import CrossLottie from "./Cross";
 import ErrorLottie from "./ErrorLottie";
 import RetryLottie from "./RetryLottie";

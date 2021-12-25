@@ -10,6 +10,8 @@ export const GroceryInstances = (
     groceryInstances: [],
     refObj: {},
     shouldRefetch: false,
+    groceryInstanceToFilter: null,
+    filteredGroceryInstances: [],
   },
   action
 ) => {
@@ -33,7 +35,25 @@ export const GroceryInstances = (
         isLoading: false,
         errMess: null,
         groceryInstances: action.payload,
-        filteredGroceryInstances: action.payload,
+      };
+
+    case ActionTypes.VIEW_ALL_GROCERY_INSTANCES:
+      console.log(
+        state.groceryInstances,
+        action.payload,
+        "groceryInstanceFilteredgroceryInstanceFiltered"
+      );
+
+      let groceryInstanceFiltered = [];
+      if (action.payload)
+        groceryInstanceFiltered = state.groceryInstances.filter(
+          (g) => action.payload.id === g.grocery.id
+        );
+
+      return {
+        ...state,
+        groceryInstanceToFilter: action.payload,
+        filteredGroceryInstances: groceryInstanceFiltered,
       };
 
     case ActionTypes.GROCERY_INSTANCES_LOADING:
@@ -44,28 +64,41 @@ export const GroceryInstances = (
       return state;
     case ActionTypes.ADD_NEW_GROCERY:
       const groceryInstancesCopy = [...state.groceryInstances];
-      const filteredGroceryInstancesCopy = [...state.filteredGroceryInstances];
+
       groceryInstancesCopy.push({
         ...action.payload,
         new: true,
       });
-      filteredGroceryInstancesCopy.push({
+
+      const filteredGroceryInstancesCopy2 = [...state.filteredGroceryInstances];
+      filteredGroceryInstancesCopy2.push({
         ...action.payload,
         new: true,
       });
 
-      const scrollData =
-        state.refObj[`c${action.payload.grocery.category}`].current;
-      window.scrollTo(
-        0,
-        scrollData.offsetTop +
-          (scrollData.offsetHeight - window.innerHeight * 0.4)
-      );
+      setTimeout(() => {
+        const scrollData =
+          state.refObj[`c${action.payload.grocery.category}`].current;
+        window.scrollTo(
+          0,
+          scrollData.offsetTop +
+            (scrollData.offsetHeight - window.innerHeight * 0.4)
+        );
+      }, 100);
 
       return {
         ...state,
         groceryInstances: groceryInstancesCopy,
-        filteredGroceryInstances: filteredGroceryInstancesCopy,
+        groceryInstanceToFilter: state.groceryInstanceToFilter
+          ? action.payload.grocery.name === state.groceryInstanceToFilter.name
+            ? state.groceryInstanceToFilter
+            : null
+          : null,
+        filteredGroceryInstances: state.groceryInstanceToFilter
+          ? action.payload.grocery.name === state.groceryInstanceToFilter.name
+            ? filteredGroceryInstancesCopy2
+            : []
+          : null,
       };
 
     case ActionTypes.MODIFY_NEW_GROCERY:
@@ -78,9 +111,173 @@ export const GroceryInstances = (
       groceryInstancesCopy2.splice(indexOfNewItem, 1);
       groceryInstancesCopy2.splice(indexOfNewItem, 0, action.payload);
 
+      let filteredGroceryInstancesCopy3 = [];
+
+      if (state.groceryInstanceToFilter) {
+        const indexOfNewItemFiltered2 =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.timestamp === action.payload.timestamp
+          );
+
+        filteredGroceryInstancesCopy3 = [...state.filteredGroceryInstances];
+
+        filteredGroceryInstancesCopy3.splice(indexOfNewItemFiltered2, 1);
+        filteredGroceryInstancesCopy3.splice(
+          indexOfNewItemFiltered2,
+          0,
+          action.payload
+        );
+      }
+
       return {
         ...state,
         groceryInstances: groceryInstancesCopy2,
+        filteredGroceryInstances: filteredGroceryInstancesCopy3,
+      };
+
+    case ActionTypes.SHOULD_UPDATE_GROCERY_INSTANCE_DETAIL:
+      const indexOfNewItemDSU = state.groceryInstances.findIndex(
+        (item) => item.id === action.payload.id
+      );
+
+      const newGroceryInstanceItemDSU =
+        state.groceryInstances[indexOfNewItemDSU];
+
+      newGroceryInstanceItemDSU.updatingDetailStatus = "pending";
+      const groceryInstancesCopyDSU = [...state.groceryInstances];
+
+      groceryInstancesCopyDSU.splice(indexOfNewItemDSU, 1);
+      groceryInstancesCopyDSU.splice(
+        indexOfNewItemDSU,
+        0,
+        newGroceryInstanceItemDSU
+      );
+
+      const filteredGroceryInstancesCopyDSU = [
+        ...state.filteredGroceryInstances,
+      ];
+
+      if (state.groceryInstanceToFilter) {
+        const filteredIndexOfNewItemDSU =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.id === action.payload.id
+          );
+
+        const filteredNewGroceryInstanceItemDSU =
+          state.filteredGroceryInstances[filteredIndexOfNewItemDSU];
+
+        filteredNewGroceryInstanceItemDSU.updatingDetailStatus = "pending";
+
+        filteredGroceryInstancesCopyDSU.splice(filteredIndexOfNewItemDSU, 1);
+        filteredGroceryInstancesCopyDSU.splice(
+          filteredIndexOfNewItemDSU,
+          0,
+          filteredNewGroceryInstanceItemDSU
+        );
+      }
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopyDSU,
+        filteredGroceryInstances: filteredGroceryInstancesCopyDSU,
+      };
+
+    case ActionTypes.SUCCESS_UPDATE_GROCERY_INSTANCE_DETAIL:
+      const indexOfNewItemDSSU = state.groceryInstances.findIndex(
+        (item) => item.id === action.payload.id
+      );
+
+      const groceryInstancesCopyDSSU = [...state.groceryInstances];
+
+      const newGroceryInstanceItemDSSU =
+        state.groceryInstances[indexOfNewItemDSSU];
+
+      newGroceryInstanceItemDSSU.updatingDetailStatus = null;
+      newGroceryInstanceItemDSSU.detail = action.payload.detail;
+
+      console.log("SHOULDUPDATENOWWWW");
+
+      groceryInstancesCopyDSSU.splice(indexOfNewItemDSSU, 1);
+      groceryInstancesCopyDSSU.splice(
+        indexOfNewItemDSSU,
+        0,
+        newGroceryInstanceItemDSSU
+      );
+
+      const filteredGroceryInstancesCopyDSSU = [
+        ...state.filteredGroceryInstances,
+      ];
+
+      if (state.groceryInstanceToFilter) {
+        const filteredIndexOfNewItemDSSU =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.id === action.payload.id
+          );
+
+        const filteredNewGroceryInstanceItemDSSU =
+          state.filteredGroceryInstances[filteredIndexOfNewItemDSSU];
+
+        filteredNewGroceryInstanceItemDSSU.updatingDetailStatus = null;
+        filteredNewGroceryInstanceItemDSSU.detail = action.payload.detail;
+
+        filteredGroceryInstancesCopyDSSU.splice(filteredIndexOfNewItemDSSU, 1);
+        filteredGroceryInstancesCopyDSSU.splice(
+          filteredIndexOfNewItemDSSU,
+          0,
+          filteredNewGroceryInstanceItemDSSU
+        );
+      }
+
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopyDSSU,
+        filteredGroceryInstances: filteredGroceryInstancesCopyDSSU,
+      };
+
+    case ActionTypes.GROCERY_INSTANCE_DETAIL_FAILED:
+      const indexOfNewItemDFU = state.groceryInstances.findIndex(
+        (item) => item.id === action.payload.id
+      );
+
+      const newGroceryInstanceItemDFU =
+        state.groceryInstances[indexOfNewItemDFU];
+
+      newGroceryInstanceItemDFU.updatingDetailStatus = "failed";
+
+      const groceryInstancesCopyDFU = [...state.groceryInstances];
+
+      groceryInstancesCopyDFU.splice(indexOfNewItemDFU, 1);
+      groceryInstancesCopyDFU.splice(
+        indexOfNewItemDFU,
+        0,
+        newGroceryInstanceItemDFU
+      );
+
+      const filteredGroceryInstancesCopyDFU = [
+        ...state.filteredGroceryInstances,
+      ];
+
+      if (state.groceryInstanceToFilter) {
+        const filteredIndexOfNewItemDFU =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.id === action.payload.id
+          );
+
+        const filteredNewGroceryInstanceItemDFU =
+          state.filteredGroceryInstances[filteredIndexOfNewItemDFU];
+
+        filteredNewGroceryInstanceItemDFU.updatingDetailStatus = "failed";
+
+        filteredGroceryInstancesCopyDFU.splice(filteredIndexOfNewItemDFU, 1);
+        filteredGroceryInstancesCopyDFU.splice(
+          filteredIndexOfNewItemDFU,
+          0,
+          filteredNewGroceryInstanceItemDFU
+        );
+      }
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopyDFU,
+        filteredGroceryInstances: filteredGroceryInstancesCopyDFU,
       };
 
     case ActionTypes.CROSS_OUT_GROCERY_INSTANCE:
@@ -99,6 +296,7 @@ export const GroceryInstances = (
         0,
         groceryInstanceToBeCrossed
       );
+
       return {
         ...state,
         groceryInstances: groceryInstancesCopy3,
@@ -106,20 +304,29 @@ export const GroceryInstances = (
 
     case ActionTypes.DELETE_GROCERY_INSTANCE:
       const groceryInstancesCopy4 = [...state.groceryInstances];
+      const filteredGroceryInstancesCopy = [...state.filteredGroceryInstances];
+
       const indexOfNewItem4 = state.groceryInstances.findIndex(
         (item) => item.id === action.payload
       );
 
-      groceryInstancesCopy4.splice(indexOfNewItem4, 1);
-      console.log(
-        "DELETEEEEEE",
-        indexOfNewItem4,
-        groceryInstancesCopy4[indexOfNewItem4]
+      const indexOfNewItemFiltered = state.filteredGroceryInstances.findIndex(
+        (item) => item.id === action.payload
       );
+
+      groceryInstancesCopy4.splice(indexOfNewItem4, 1);
+      filteredGroceryInstancesCopy.splice(indexOfNewItemFiltered, 1);
+
+      let lastItemRemoved = false;
+      if (!filteredGroceryInstancesCopy.length) lastItemRemoved = true;
 
       return {
         ...state,
         groceryInstances: groceryInstancesCopy4,
+        filteredGroceryInstances: filteredGroceryInstancesCopy,
+        groceryInstanceToFilter: lastItemRemoved
+          ? null
+          : state.groceryInstanceToFilter,
       };
     case ActionTypes.GROCERY_INSTANCES_REFETCH:
       return {

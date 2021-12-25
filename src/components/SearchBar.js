@@ -6,6 +6,7 @@ import {
   handleChangeNewGrocery,
   handleChooseGrocery,
   handleSubmitNewGrocery,
+  viewAllGroceryInstances,
 } from "../redux/ActionCreators";
 
 const mapStateToProps = (state) => {
@@ -23,6 +24,7 @@ const mapDispatchToProps = {
   handleChooseGrocery: (grocery, ref) => handleChooseGrocery(grocery, ref),
   handleSubmitNewGrocery: (grocery, ref) =>
     handleSubmitNewGrocery(grocery, ref),
+  viewAllGroceryInstances: (grocery) => viewAllGroceryInstances(grocery),
 };
 
 class SearchBar extends Component {
@@ -64,6 +66,10 @@ class SearchBar extends Component {
       } else {
         handleActivateSearch(true);
       }
+    };
+
+    const handleViewAllClick = (grocery) => {
+      this.props.viewAllGroceryInstances(grocery);
     };
     return (
       <div className="input-group ing-search-container mb-2">
@@ -139,16 +145,106 @@ class SearchBar extends Component {
                         .filter((grocery) => grocery.category.id === cat.id)
                         .map((g) => {
                           return (
-                            <div
-                              onClick={() =>
-                                this.props.handleChooseGrocery(
-                                  g,
-                                  this.props.groceryInstances.refObj
-                                )
-                              }
-                              className="mb-1 pb-2 ml-1 border-bottom added-item"
-                            >
-                              {g.name}
+                            <div className="mb-1 pb-2 ml-1 border-bottom added-item d-flex">
+                              <span
+                                onClick={() =>
+                                  this.props.handleChooseGrocery(
+                                    g,
+                                    this.props.groceryInstances.refObj
+                                  )
+                                }
+                              >
+                                + {g.name}{" "}
+                              </span>
+
+                              {this.props.groceryInstances.groceryInstances.filter(
+                                (gI) => gI.grocery.id === g.id
+                              ).length ? (
+                                <>
+                                  <span className="grocery-search-qty">
+                                    -{" "}
+                                    {
+                                      this.props.groceryInstances.groceryInstances.filter(
+                                        (gI) => gI.grocery.id === g.id
+                                      ).length
+                                    }{" "}
+                                    in list
+                                  </span>
+
+                                  {this.props.groceryInstances
+                                    .groceryInstanceToFilter ? (
+                                    this.props.groceryInstances
+                                      .groceryInstanceToFilter.id === g.id ? (
+                                      <div
+                                        className="ml-auto d-flex filter-active-container"
+                                        onClick={() => handleViewAllClick(null)}
+                                      >
+                                        <div className="mr-2">Reset</div>
+                                        <i
+                                          className="fa fa-times  hvr-grow mr-2 mt-1"
+                                          style={{ color: "#7ca982" }}
+                                        ></i>
+                                      </div>
+                                    ) : (
+                                      <div
+                                        className="ml-auto"
+                                        onClick={() => handleViewAllClick(g)}
+                                      >
+                                        <i
+                                          className="fa fa-eye  hvr-grow mr-1"
+                                          style={{ color: "#7ca982" }}
+                                        ></i>
+                                        <span
+                                          className="mr-1"
+                                          style={{ color: "#7ca982" }}
+                                        >
+                                          View{" "}
+                                          <span
+                                            style={{
+                                              opacity:
+                                                this.props.groceryInstances.groceryInstances.filter(
+                                                  (gI) => gI.grocery.id === g.id
+                                                ).length > 1
+                                                  ? 1
+                                                  : 0,
+                                            }}
+                                          >
+                                            all
+                                          </span>
+                                        </span>
+                                      </div>
+                                    )
+                                  ) : (
+                                    <div
+                                      className="ml-auto"
+                                      onClick={() => handleViewAllClick(g)}
+                                    >
+                                      <i
+                                        className="fa fa-eye  hvr-grow mr-1"
+                                        style={{ color: "#7ca982" }}
+                                      ></i>
+                                      <span
+                                        className="mr-1"
+                                        style={{ color: "#7ca982" }}
+                                      >
+                                        View{" "}
+                                        <span
+                                          style={{
+                                            opacity:
+                                              this.props.groceryInstances.groceryInstances.filter(
+                                                (gI) => gI.grocery.id === g.id
+                                              ).length > 1
+                                                ? 1
+                                                : 0,
+                                          }}
+                                        >
+                                          all
+                                        </span>
+                                      </span>
+                                    </div>
+                                  )}
+                                </>
+                              ) : null}
                             </div>
                           );
                         })}

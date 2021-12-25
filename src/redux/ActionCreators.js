@@ -42,6 +42,16 @@ export const addGroceryInstances = (groceryInstances) => ({
   payload: groceryInstances,
 });
 
+export const viewAllGroceryInstances = (groceryInstance) => (dispatch) => {
+  dispatch(viewAllGroceryInstances1(groceryInstance));
+  if (window.innerWidth < 992) dispatch(setSearchActive(false));
+};
+
+export const viewAllGroceryInstances1 = (groceryInstance) => ({
+  type: ActionTypes.VIEW_ALL_GROCERY_INSTANCES,
+  payload: groceryInstance,
+});
+
 export const crossOutGroceryInstanceInServer =
   (groceryInstance) => (dispatch) => {
     const newGroceryInstances = {
@@ -78,6 +88,62 @@ export const crossOutGroceryInstanceInServer =
         alert("Your grocery could not be crossed\nError: " + error.message);
       });
   };
+
+export const updatedGroceryInstanceDetail =
+  (groceryInstance, detail) => (dispatch) => {
+    const newGroceryInstance = {
+      ...groceryInstance,
+      detail: detail,
+      updatingDetailStatus: false,
+    };
+    dispatch(shouldUpdatedGroceryInstanceDetail(newGroceryInstance));
+
+    return fetch(baseUrl + `grocery-instances/${groceryInstance.id}`, {
+      method: "PUT",
+      body: JSON.stringify(newGroceryInstance),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then(
+        (response) => {
+          if (response.ok) {
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
+          throw error;
+        }
+      )
+      .then((response) => response.json())
+      .then((groceryInstance) =>
+        dispatch(successfullyUpdatedGroceryInstanceDetail(groceryInstance))
+      )
+      .catch((error) => {
+        dispatch(failedUpdatingGroceryDetail(groceryInstance));
+      });
+  };
+
+export const shouldUpdatedGroceryInstanceDetail = (groceryInstance) => ({
+  type: ActionTypes.SHOULD_UPDATE_GROCERY_INSTANCE_DETAIL,
+  payload: groceryInstance,
+});
+
+export const successfullyUpdatedGroceryInstanceDetail = (groceryInstance) => ({
+  type: ActionTypes.SUCCESS_UPDATE_GROCERY_INSTANCE_DETAIL,
+  payload: groceryInstance,
+});
+
+export const failedUpdatingGroceryDetail = (groceryInstance) => ({
+  type: ActionTypes.GROCERY_INSTANCE_DETAIL_FAILED,
+  payload: groceryInstance,
+});
 
 export const crossOutGroceryInstance = (id) => ({
   type: ActionTypes.CROSS_OUT_GROCERY_INSTANCE,

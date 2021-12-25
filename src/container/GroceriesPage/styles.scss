@@ -16,8 +16,30 @@ $grey: #ced4da;
   border-color: $green !important;
 }
 
+.filter-active-container {
+  background-color: $light-green;
+  padding: 0px 0px 0px 10px;
+  border-radius: 10px;
+  position: relative;
+  top: 2px;
+}
+
+.clear-filter-button {
+  background-color: $green;
+  color: $pale-light-green;
+  padding: 2px 10px;
+  border-radius: 10px;
+  margin-left: auto;
+}
 .card {
   border-color: $green !important;
+}
+
+.grocery-search-qty {
+  color: $green;
+  font-size: 14px;
+  margin-top: 2px;
+  margin-left: 5px;
 }
 
 .grocery-edit-btn,
@@ -67,7 +89,20 @@ $grey: #ced4da;
   }
 }
 
+.card-image {
+  width: 80px;
+  height: 80px;
+  position: relative;
+  z-index: 98;
+  object-fit: contain;
+}
+
 @media (max-width: 992px) {
+  .card-image {
+    width: 60px;
+    height: 60px;
+  }
+
   .card-header {
     font-size: 12px !important;
     overflow: hidden;
@@ -75,7 +110,7 @@ $grey: #ced4da;
     text-overflow: ellipsis;
     padding-right: 2px !important;
     padding-left: 2px !important;
-    padding-bottom: 4px !important;
+    padding-bottom: 12px !important;
     transition: opacity 1s;
   }
 
@@ -88,8 +123,8 @@ $grey: #ced4da;
 
   .mobile-card-clickable-sec {
     position: absolute;
-    top: 0;
-    height: calc(100% - 30px);
+    top: 50px;
+    height: calc(100% - 50px);
     width: 100%;
     background-color: rgba(0, 0, 0, 0);
     z-index: 99;
@@ -104,14 +139,7 @@ $grey: #ced4da;
   border-color: $light-green !important;
   white-space: nowrap;
   transition: all 1s;
-}
-
-.card-image {
-  width: 80px;
-  height: 80px;
-  position: relative;
-  z-index: 98;
-  object-fit: contain;
+  z-index: 1;
 }
 
 .card-body {
@@ -330,12 +358,6 @@ $grey: #ced4da;
     font-size: 14px !important;
   }
 }
-@media (min-width: 992px) {
-  .grocery-header {
-    font-size: 16px !important;
-  }
-}
-
 .grocery-note {
   font-size: 11px;
   position: absolute;
@@ -343,12 +365,25 @@ $grey: #ced4da;
   left: 5%;
   top: 30px;
   border: 0;
-  background-color: $pale-light-green;
+  background-color: rgba(0, 0, 0, 0);
   text-align: center;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
   color: grey;
+  z-index: 0;
+}
+
+@media (min-width: 992px) {
+  .grocery-header {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .grocery-note {
+    top: 25px;
+  }
 }
 
 .grocery-note::placeholder {
@@ -358,6 +393,7 @@ $grey: #ced4da;
 .added-item {
   color: inherit;
   cursor: pointer;
+  color: $dark-green;
 }
 
 .grocery-modal-image {
@@ -932,6 +968,7 @@ $grey: #ced4da;
   text-decoration-color: red !important;
   text-decoration: line-through;
 }
+
 .striked-out,
 .striked-out:hover {
   border-color: rgba(0, 0, 0, 0.3) !important;
@@ -944,6 +981,7 @@ $grey: #ced4da;
   .card-header {
     background-color: rgba(0, 0, 0, 0.05) !important;
   }
+
   .grocery-header,
   .grocery-header:hover {
     color: rgba(0, 0, 0, 0.3) !important;
@@ -954,7 +992,8 @@ $grey: #ced4da;
   }
 
   .grocery-note {
-    display: none !important;
+    background-color: rgba(0, 0, 0, 0);
+    color: rgba(0, 0, 0, 0.3) !important;
   }
 }
 

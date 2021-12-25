@@ -16,7 +16,7 @@ export default class LottieControl extends React.Component {
     const defaultOptions = {
       loop: true,
       autoplay: true,
-      animationData: require("../../spinner.json"),
+      animationData: require("../error.json"),
       rendererSettings: {
         preserveAspectRatio: "xMidYMid slice",
       },
@@ -26,11 +26,11 @@ export default class LottieControl extends React.Component {
       <div>
         <Lottie
           options={defaultOptions}
-          height={50}
-          width={50}
+          height={30}
+          width={30}
           isStopped={this.state.isStopped}
           isPaused={this.state.isPaused}
-          style={{ position: "absolute", marginLeft: -27, marginTop: -12 }}
+          style={{ position: "absolute", zIndex: 9999, right: 4, top: 20 }}
         />
       </div>
     );
