@@ -646,6 +646,11 @@ export const editIngredient = (grocery, note, position) => ({
   },
 });
 
+export const updateIngredientsList = (ingredients) => ({
+  type: ActionTypes.UPGRADE_INGREDIENTS_LIST,
+  payload: ingredients,
+});
+
 export const addPrepStep = (prepStep) => ({
   type: ActionTypes.ADD_PREP_STEP,
   payload: prepStep,

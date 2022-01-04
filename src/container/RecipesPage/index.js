@@ -21,7 +21,6 @@ import RecipeDetailsModal from "./RecipeDetailsModal";
 import RecipeEditModal from "./RecipeEditModal";
 
 import { fetchRecipeDetails } from "../../redux/ActionCreators";
-import DraggableListExample from "./DraggableListExample";
 
 const mapStateToProps = (state) => {
   return {
@@ -224,8 +223,6 @@ class Recipes extends Component {
               )}
             </div>
           </div>
-
-          <DraggableListExample />
         </div>
       </>
     );

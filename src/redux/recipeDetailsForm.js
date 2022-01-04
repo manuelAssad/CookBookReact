@@ -31,6 +31,19 @@ export const InitialRecipeDetails = (
         ...state,
         ingredients: ingredientsCopyE,
       };
+
+    case ActionTypes.UPGRADE_INGREDIENTS_LIST:
+      const originalList = [...action.payload];
+      const newList = [];
+      originalList.forEach((item, i) => {
+        const newItem = item;
+        newItem.position = i;
+        newList.push(newItem);
+      });
+      return {
+        ...state,
+        ingredients: newList,
+      };
     case ActionTypes.DELETE_RECIPE_INGREDIENT:
       const ingredientsCopy = [...state.ingredients];
       const positionOfDeletedItem = action.payload;

@@ -14,6 +14,7 @@ import update from "immutability-helper";
 import {
   deleteRecipeIngredient,
   setIngredientToEdit,
+  updateIngredientsList,
 } from "../../redux/ActionCreators";
 
 const ItemTypes = {
@@ -36,15 +37,14 @@ const IngredientCard = ({
   toggleAddModal,
   ing,
   i,
-  id,
+  position,
   findCard,
   moveCard,
+  setOverIndex,
+  overIndex,
+  handleDeleteIngredient,
 }) => {
   const dispatch = useDispatch();
-
-  const handleDeleteIngredient = (i) => {
-    dispatch(deleteRecipeIngredient(i));
-  };
 
   const handleEditIngredient = (ing) => {
     toggleModal();
@@ -52,50 +52,59 @@ const IngredientCard = ({
     dispatch(setIngredientToEdit(ing));
   };
 
-  const originalIndex = findCard(id).index;
+  const originalIndex = findCard(position).index;
 
-  const [{ isDragging }, drag] = useDrag(
+  const [{ isDragging, end }, drag] = useDrag(
     () => ({
       type: ItemTypes.CARD,
-      item: { id, originalIndex },
+      item: { position, originalIndex },
       collect: (monitor) => ({
         isDragging: monitor.isDragging(),
       }),
       end: (item, monitor) => {
-        const { id: droppedId, originalIndex } = item;
-
+        const { position: droppedId, originalIndex } = item;
         const didDrop = monitor.didDrop();
         if (!didDrop) {
           moveCard(droppedId, originalIndex);
+          setOverIndex(null);
+        } else {
+          setOverIndex(null);
         }
       },
     }),
-    [id, originalIndex, moveCard]
+    [position, originalIndex, moveCard]
   );
 
   const [, drop] = useDrop(
     () => ({
       accept: ItemTypes.CARD,
-      hover({ id: draggedId }) {
-        if (draggedId !== id) {
-          const { index: overIndex } = findCard(id);
+      hover({ position: draggedId }) {
+        if (draggedId !== position) {
+          const { index: overIndex } = findCard(position);
           moveCard(draggedId, overIndex);
+          setOverIndex(overIndex);
         }
       },
     }),
     [findCard, moveCard]
   );
+  const opacity = isDragging || overIndex == i ? 0 : 1;
 
   return (
     <div
-      className="row"
+      className="row igredients-list-item mt-2"
       ref={(node) => drag(drop(node))}
-      style={{ opacity: isDragging ? 0 : 1 }}
+      style={{
+        opacity,
+      }}
     >
-      {console.log("MONITORRRR", isDragging, id)}
-      <div className="col-12 mt-3 igredients-list-item">
+      <div
+        className="col-12"
+        onMouseDown={() => console.log("Hi")}
+        onMouseUp={() => console.log("Hello")}
+      >
         <div className="row">
-          <div className="col">
+          <div className="col" onMouseUp={() => console.log("Hello")}>
             <i
               className="fa fa-edit hvr-grow"
               onClick={() => handleEditIngredient(ing)}
@@ -124,34 +133,56 @@ const IngredientCard = ({
 };
 
 const IngredientsList = (props) => {
+  const dispatch = useDispatch();
+
   const ingredients = useSelector((state) => state.recipeForm.ingredients);
+  const [cards, setCards] = useState(ingredients);
+
+  const handleDeleteIngredient = (i) => {
+    dispatch(deleteRecipeIngredient(i));
+    setCards(
+      update(cards, {
+        $splice: [[i, 1]],
+      })
+    );
+  };
 
   const [, drop] = useDrop(() => ({ accept: ItemTypes.CARD }));
-  const [cards, setCards] = useState(ITEMS);
 
-  const findCard = (id) => {
-    const card = cards.filter((c) => `${c.id}` === id)[0];
+  const [overIndex, setOverIndex] = useState(null);
+
+  document.body.ondrop = () => {
+    setTimeout(() => {
+      dispatch(updateIngredientsList(cards));
+    }, 400);
+  };
+
+  const findCard = (position) => {
+    const card = cards.filter((c) => `${c.position}` === position)[0];
     return {
       card,
       index: cards.indexOf(card),
     };
   };
 
-  const moveCard = (id, atIndex) => {
-    const { card, index } = findCard(id);
-    setCards(
-      update(cards, {
-        $splice: [
-          [index, 1],
-          [atIndex, 0, card],
-        ],
-      })
-    );
+  const moveCard = (position, atIndex) => {
+    const { card, index } = findCard(position);
+
+    const newCardsArray = update(cards, {
+      $splice: [
+        [index, 1],
+        [atIndex, 0, card],
+      ],
+    });
+    setCards(newCardsArray);
+  };
+  const setOverIndexHandler = (index) => {
+    setOverIndex(index);
   };
 
   return (
     <div className="container-fluid" ref={drop}>
-      {!ingredients.length && (
+      {!cards.length && (
         <div className="row">
           <div className="col-12 mt-3">No ingredients in list</div>
         </div>
@@ -161,14 +192,17 @@ const IngredientsList = (props) => {
         return (
           <div>
             <IngredientCard
-              key={card.id}
+              key={card.position}
               ing={card}
               i={i}
-              id={`${card.id}`}
+              position={`${card.position}`}
               toggleModal={props.toggleModal}
               toggleAddModal={props.toggleAddModal}
               moveCard={moveCard}
               findCard={findCard}
+              setOverIndex={setOverIndexHandler}
+              overIndex={overIndex}
+              handleDeleteIngredient={handleDeleteIngredient}
             />
           </div>
         );
@@ -225,31 +259,31 @@ export default IngredientsListModal;
 
 const ITEMS = [
   {
-    id: 1,
+    position: 1,
     grocery: { name: "Write a cool JS library" },
   },
   {
-    id: 2,
+    position: 2,
     grocery: { name: "Make it generic enough" },
   },
   {
-    id: 3,
+    position: 3,
     grocery: { name: "Write README" },
   },
   {
-    id: 4,
+    position: 4,
     grocery: { name: "Create some examples" },
   },
   {
-    id: 5,
+    position: 5,
     grocery: { name: "Spam in Twitter and IRC to promote it" },
   },
   {
-    id: 6,
+    position: 6,
     grocery: { name: "???" },
   },
   {
-    id: 7,
+    position: 7,
     grocery: { name: "PROFIT" },
   },
 ];
