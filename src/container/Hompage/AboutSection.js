@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 
+import myPic from "../../myPic.png";
+
 class About extends Component {
   render() {
     return (
@@ -10,7 +12,7 @@ class About extends Component {
         <div className="row">
           <img
             className="mx-auto about-image mt-2 mt-md-4"
-            src="https://www.ochd.org/wp-content/uploads/2020/01/g-shopping-1200x630.jpg"
+            src={myPic}
             alt="Breadcrumb Trail Campground"
           />
         </div>
@@ -29,10 +31,12 @@ class About extends Component {
         </div>
         <div className="row">
           <p className="mx-auto about-paragraph">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Quia
-            doloribus molestiae quaerat natus. Voluptatibus quod ducimus
-            reprehenderit sequi repellendus natus. Quasi nulla animi officiis ex
-            dolore cupiditate facere neque corrupti.
+            A former electrical engineer considering on persuing a career that
+            has more room for creativity. I believe that everyone should keep
+            searching for the career that suits them the best and this
+            definetely feels the best match form me. The love for food and
+            cooking made me decide to create my first coding project related to
+            something i really love.
           </p>
         </div>
 

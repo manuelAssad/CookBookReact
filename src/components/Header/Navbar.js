@@ -3,7 +3,10 @@ import "./styles.scss";
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { handleClickCategory } from "../../redux/ActionCreators";
+import {
+  handleClickCategory,
+  handlePauseDetection,
+} from "../../redux/ActionCreators";
 
 import {
   Collapse,
@@ -175,9 +178,10 @@ const NavbarComponent = (props) => {
               key={pageName}
               data={mobileTabsData}
               activeTab={groceryCategories.activeCat}
-              onTabClick={(id) =>
-                dispatch(handleClickCategory(id, groceryInstances.refObj))
-              }
+              onTabClick={(id) => {
+                dispatch(handleClickCategory(id, groceryInstances.refObj));
+                dispatch(handlePauseDetection());
+              }}
               groupName={"groceryCategories"}
             />
           ) : pageName === "recipes" &&

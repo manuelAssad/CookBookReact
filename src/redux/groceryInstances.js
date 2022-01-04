@@ -60,8 +60,6 @@ export const GroceryInstances = (
       return { ...state, isLoading: true, errMess: null };
     case ActionTypes.GROCERY_INSTANCES_FAILED:
       return { ...state, isLoading: false, errMess: action.payload };
-    default:
-      return state;
     case ActionTypes.ADD_NEW_GROCERY:
       const groceryInstancesCopy = [...state.groceryInstances];
 
@@ -79,6 +77,7 @@ export const GroceryInstances = (
       setTimeout(() => {
         const scrollData =
           state.refObj[`c${action.payload.grocery.category}`].current;
+
         window.scrollTo(
           0,
           scrollData.offsetTop +
@@ -98,7 +97,81 @@ export const GroceryInstances = (
           ? action.payload.grocery.name === state.groceryInstanceToFilter.name
             ? filteredGroceryInstancesCopy2
             : []
-          : null,
+          : [],
+      };
+
+    case ActionTypes.ADD_NEW_GROCERY_FAILED:
+      const indexOfNewItemF = state.groceryInstances.findIndex(
+        (item) => item.timestamp === action.payload.timestamp
+      );
+
+      const groceryInstancesCopyF = [...state.groceryInstances];
+
+      const newGrocerInstanceF = groceryInstancesCopyF[indexOfNewItemF];
+      newGrocerInstanceF.new = false;
+
+      groceryInstancesCopyF.splice(indexOfNewItemF, 1);
+      groceryInstancesCopyF.splice(indexOfNewItemF, 0, newGrocerInstanceF);
+
+      let filteredGroceryInstancesCopyF = [];
+
+      if (state.groceryInstanceToFilter) {
+        const indexOfNewItemFilteredF2 =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.timestamp === action.payload.timestamp
+          );
+
+        filteredGroceryInstancesCopyF = [...state.filteredGroceryInstances];
+
+        filteredGroceryInstancesCopyF.splice(indexOfNewItemFilteredF2, 1);
+        filteredGroceryInstancesCopyF.splice(
+          indexOfNewItemFilteredF2,
+          0,
+          action.payload
+        );
+      }
+
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopyF,
+        filteredGroceryInstances: filteredGroceryInstancesCopyF,
+      };
+
+    case ActionTypes.ADD_NEW_GROCERY_AGAIN:
+      const indexOfNewItemA = state.groceryInstances.findIndex(
+        (item) => item.timestamp === action.payload.timestamp
+      );
+
+      const groceryInstancesCopyA = [...state.groceryInstances];
+
+      const newGrocerInstanceA = groceryInstancesCopyA[indexOfNewItemA];
+      newGrocerInstanceA.new = true;
+
+      groceryInstancesCopyA.splice(indexOfNewItemA, 1);
+      groceryInstancesCopyA.splice(indexOfNewItemA, 0, newGrocerInstanceA);
+
+      let filteredGroceryInstancesCopyA = [];
+
+      if (state.groceryInstanceToFilter) {
+        const indexOfNewItemFilteredA2 =
+          state.filteredGroceryInstances.findIndex(
+            (item) => item.timestamp === action.payload.timestamp
+          );
+
+        filteredGroceryInstancesCopyA = [...state.filteredGroceryInstances];
+
+        filteredGroceryInstancesCopyA.splice(indexOfNewItemFilteredA2, 1);
+        filteredGroceryInstancesCopyA.splice(
+          indexOfNewItemFilteredA2,
+          0,
+          action.payload
+        );
+      }
+
+      return {
+        ...state,
+        groceryInstances: groceryInstancesCopyA,
+        filteredGroceryInstances: filteredGroceryInstancesCopyA,
       };
 
     case ActionTypes.MODIFY_NEW_GROCERY:
@@ -333,5 +406,7 @@ export const GroceryInstances = (
         ...state,
         shouldRefetch: true,
       };
+    default:
+      return state;
   }
 };

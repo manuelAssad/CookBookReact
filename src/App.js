@@ -14,8 +14,8 @@ class App extends Component {
   render() {
     return (
       <Provider store={store}>
+        s
         <BrowserRouter>
-          s
           <div className="App">
             <Main />
           </div>

@@ -4,7 +4,10 @@ import { CSSTransition } from "react-transition-group";
 
 import { useDispatch } from "react-redux";
 
-import { updatedGroceryInstanceDetail } from "../../redux/ActionCreators";
+import {
+  updatedGroceryInstanceDetail,
+  postGrocery,
+} from "../../redux/ActionCreators";
 
 import OutsideClickHandler from "react-outside-click-handler";
 
@@ -37,18 +40,19 @@ const GroceryCard = (props) => {
   };
   return (
     <div
-      className={`col-xl-2 col-lg-3 col-md-3 col-4 col-4 ${
-        props.item.id !== undefined ? "p-0" : "rainbow"
-      }`}
+      className={`col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0`}
+      onClick={() =>
+        props.item.id ? null : dispatch(postGrocery(props.item, true))
+      }
     >
-      <div>
+      <div className={`${!props.item.id ? "vibrate" : null}`}>
         <div
           className={` ${
             props.item.crossed ? "striked-out" : null
           } small-card-padding ${props.item.new ? "blinking" : ""}`}
         >
           <div
-            className={`card  ${
+            className={`card   ${
               props.item.crossed ? "striked-out" : null
             } small-card-padding ${
               props.groceryInstances.filter(
@@ -77,7 +81,7 @@ const GroceryCard = (props) => {
                   <Error />
                 </div>
               ) : null}
-              <h4
+              <div
                 className={`grocery-header`}
                 onClick={() => props.handleCrossOutItem(props.item)}
               >
@@ -92,15 +96,22 @@ const GroceryCard = (props) => {
                       : ""
                   }`}
                 >
-                  {props.item.grocery.name}
+                  {props.item.grocery.name.slice(0, 12)}{" "}
+                  {!props.item.id ? (
+                    <i
+                      className="fa fa-exclamation-triangle ml-auto hvr-grow"
+                      style={{ color: "red" }}
+                    ></i>
+                  ) : null}
+                  {props.item.grocery.name.length > 12 ? "..." : null}
                 </span>
-              </h4>
+              </div>
 
               <OutsideClickHandler onOutsideClick={handleSubmitDetail}>
                 <input
                   className="grocery-note"
                   placeholder="add detail"
-                  value={cardDetail}
+                  value={!props.item.id ? "failed to upload" : cardDetail}
                   onChange={handleEditDetail}
                 />
               </OutsideClickHandler>
@@ -209,7 +220,7 @@ const GroceriesList = (props) => {
             .map((item, index) => {
               return (
                 <>
-                  {item.id === undefined ? (
+                  {item.id === undefined && item.new ? (
                     <div
                       className={`col-xl-2 col-lg-3 col-md-3 col-4 col-4 rainbow
                                    `}
@@ -239,7 +250,8 @@ const GroceriesList = (props) => {
                             }`}
                           >
                             <h4 className={`grocery-header`}>
-                              {item.grocery.name} {item.crossed ? "*" : ""}
+                              {item.grocery.name.slice(0, 12)}
+                              {item.grocery.name.length > 12 ? "..." : null}
                             </h4>
                             <input
                               className="grocery-note"

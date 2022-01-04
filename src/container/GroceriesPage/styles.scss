@@ -49,6 +49,13 @@ $grey: #ced4da;
   color: $pale-light-green !important;
 }
 
+.card-header {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden !important;
+  text-overflow: ellipsis;
+}
+
 @media (min-width: 992px) {
   .grocery-header:hover {
     text-decoration: line-through;
@@ -105,9 +112,6 @@ $grey: #ced4da;
 
   .card-header {
     font-size: 12px !important;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
     padding-right: 2px !important;
     padding-left: 2px !important;
     padding-bottom: 12px !important;
@@ -133,11 +137,10 @@ $grey: #ced4da;
 
 .card-header {
   border-width: 0px !important;
-  font-size: 18px;
+  font-size: 12px;
   text-align: center;
   background-color: $pale-light-green !important;
   border-color: $light-green !important;
-  white-space: nowrap;
   transition: all 1s;
   z-index: 1;
 }
@@ -259,6 +262,7 @@ $grey: #ced4da;
   border-radius: 3px;
   margin-left: -16px;
 }
+
 .search-close-cont {
   cursor: pointer;
   width: 100%;
@@ -304,6 +308,17 @@ $grey: #ced4da;
   }
   .btn-ing-search {
     display: block;
+  }
+}
+
+.search-box-recipe-modal {
+  width: 100%;
+  margin-left: 0px;
+}
+
+@media (max-width: 992px) {
+  .search-box-recipe-modal {
+    max-height: 100px;
   }
 }
 
@@ -353,11 +368,18 @@ $grey: #ced4da;
   font-size: 12px !important;
 }
 
+.card-header {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 @media (min-width: 576px) {
   .grocery-header {
     font-size: 14px !important;
   }
 }
+
 .grocery-note {
   font-size: 11px;
   position: absolute;
@@ -444,17 +466,17 @@ $grey: #ced4da;
 }
 
 .grocery-modal-button-1 {
-  width: 100%;
-  background-color: $green;
-  border-color: $green;
-  color: $pale-light-green;
+  width: 100% !important;
+  background-color: $green !important;
+  border-color: $green !important;
+  color: $pale-light-green !important;
 }
 
 .grocery-modal-button-2 {
-  width: 100%;
-  background-color: rgb(160, 9, 9);
-  border-color: rgb(160, 9, 9);
-  color: $pale-light-green;
+  width: 100% !important;
+  background-color: rgb(160, 9, 9) !important;
+  border-color: rgb(160, 9, 9) !important;
+  color: $pale-light-green !important;
 }
 
 .grocery-modal-button-1:focus,
@@ -762,7 +784,7 @@ $grey: #ced4da;
 }
 
 .cook-time-input {
-  width: 60px;
+  width: 60px !important;
 }
 
 @media screen and (max-width: 600px) {
@@ -779,15 +801,25 @@ $grey: #ced4da;
 .servings-button,
 .servings-button:hover,
 .servings-button:active {
-  border-color: $green;
-  color: $green;
-  font-size: 22px;
-  padding: 0px 10px;
+  border-color: $green !important;
+  color: $green !important;
+  font-size: 22px !important;
+  padding: 0px 10px !important;
 }
 
 .add-recipe-modal-btn {
-  background-color: $pale-light-green;
-  border-color: $green;
+  background-color: $pale-light-green !important;
+  border-color: $green !important;
+  font-size: 15px !important;
+  padding: 8px 0px !important;
+}
+
+.view-recipe-modal-btn {
+  background-color: rgba(0, 0, 0, 0) !important;
+  color: $green !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  font-size: 15px !important;
+  padding: 8px 0px !important;
 }
 
 .igredients-list-item {
@@ -865,6 +897,47 @@ $grey: #ced4da;
 @keyframes rotate {
   100% {
     transform: rotate(1turn);
+  }
+}
+
+@keyframes shake {
+  0% {
+    transform: translate(0, 0px);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(0.96);
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.vibrate {
+  position: relative;
+  z-index: -1;
+  border-radius: 5px !important;
+  overflow: hidden;
+  padding: 1px !important;
+  background-color: red;
+  animation: shake 1.5s;
+  animation-iteration-count: infinite;
+
+  .card {
+    z-index: 99;
+    border-radius: 5px !important;
+  }
+  .card-header {
+    color: grey;
+    background-color: rgba(0, 0, 0, 0.04) !important;
+  }
+  .card-image {
+    opacity: 0.7;
+  }
+  .grocery-note {
+    color: red;
   }
 }
 

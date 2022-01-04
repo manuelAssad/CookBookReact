@@ -159,16 +159,19 @@ $grey: #ced4da;
   margin-top: -2px;
   background-color: $green;
 }
+
+.panel-label:before {
+  transform: rotate(-90deg);
+  transition: transform 0.35s cubic-bezier(0.65, 0.05, 0.36, 1);
+}
+
 .panel-label-number {
   position: relative;
   right: 10px;
   font-size: 18px;
   color: $green;
 }
-.panel-label:before {
-  transform: rotate(-90deg);
-  transition: transform 0.35s cubic-bezier(0.65, 0.05, 0.36, 1);
-}
+
 .panel[aria-expanded="true"] .panel-content {
   opacity: 1;
 }
@@ -192,4 +195,26 @@ $grey: #ced4da;
 }
 .panel:not(:last-child) {
   margin-bottom: 3px;
+}
+
+.selected-new-ingredient {
+  border: solid $green 1px;
+  background-color: $green;
+  color: $pale-light-green;
+  border-radius: 100px;
+  height: 35px;
+  padding: 5px 15px;
+  position: absolute;
+  top: 17px;
+  left: 50px;
+  z-index: 99;
+}
+
+.remove-selected-new-ingredient {
+  margin-left: 5px;
+  color: $pale-light-green;
+  font-weight: 600;
+  border-radius: 10px !important;
+  padding: 0 4px;
+  cursor: pointer;
 }

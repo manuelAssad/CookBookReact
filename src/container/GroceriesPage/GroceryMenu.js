@@ -82,12 +82,13 @@ class GroceryMenu extends Component {
                                 ? "active"
                                 : ""
                             }`}
-                            onClick={() =>
+                            onClick={() => {
                               this.props.handleClickCategory(
                                 cat.id,
                                 this.props.groceryInstances.refObj
-                              )
-                            }
+                              );
+                              this.props.pauseDetection();
+                            }}
                           >
                             {cat.name}
                           </a>

@@ -8,6 +8,8 @@ import {
   fetchRecipes,
   setRecipeCategory,
   setHistory,
+  setSearchActive,
+  handleChangeNewGrocery,
 } from "../../redux/ActionCreators";
 
 import { withRouter } from "react-router-dom";
@@ -16,7 +18,10 @@ import ContentLoader from "react-content-loader";
 
 import RecipeDetailsModal from "./RecipeDetailsModal";
 
+import RecipeEditModal from "./RecipeEditModal";
+
 import { fetchRecipeDetails } from "../../redux/ActionCreators";
+import DraggableListExample from "./DraggableListExample";
 
 const mapStateToProps = (state) => {
   return {
@@ -29,6 +34,8 @@ const mapDispatchToProps = {
   setRecipeCategory: (cat) => setRecipeCategory(cat),
   setHistory: (history) => setHistory(history),
   fetchRecipeDetails: (id) => fetchRecipeDetails(id),
+  setSearchActive: (v) => setSearchActive(v),
+  handleChangeNewGrocery: (v) => handleChangeNewGrocery(v),
 };
 
 class Recipes extends Component {
@@ -39,6 +46,7 @@ class Recipes extends Component {
     ],
     detailsModalOpen: false,
     recipeOpen: {},
+    editModalOpen: false,
   };
   componentDidMount() {
     this.props.setHistory(this.props.history);
@@ -83,6 +91,12 @@ class Recipes extends Component {
   render() {
     return (
       <>
+        <RecipeEditModal
+          modalOpen={this.state.editModalOpen}
+          toggleModal={() => {
+            this.setState({ editModalOpen: !this.state.editModalOpen });
+          }}
+        />
         <RecipeDetailsModal
           modalOpen={this.state.detailsModalOpen}
           toggle={() =>
@@ -175,26 +189,43 @@ class Recipes extends Component {
                   })}
                 </>
               ) : (
-                <div className="tab-content">
-                  <div className="tab-pane fade show active">
-                    <div className="row overflow-hidden">
-                      {this.props.recipes.filteredRecipes.map((recipe) => {
-                        return (
-                          <RecipeCard
-                            handleRecipeClick={() =>
-                              this.handleRecipeClick(recipe)
-                            }
-                            key={recipe.id}
-                            recipe={recipe}
-                          />
-                        );
-                      })}
+                <div className="row">
+                  {this.props.recipes.filteredRecipes.map((recipe) => {
+                    return (
+                      <RecipeCard
+                        handleRecipeClick={() => this.handleRecipeClick(recipe)}
+                        key={recipe.id}
+                        recipe={recipe}
+                      />
+                    );
+                  })}
+                  <div
+                    className="col-xl-4 col-md-6 col-12 p-2  hvr-grow"
+                    onClick={() =>
+                      this.setState({
+                        editModalOpen: !this.state.editModalOpen,
+                      })
+                    }
+                  >
+                    <div className="recipe-card-add-container">
+                      <div>
+                        <img
+                          className="w-100"
+                          src="https://delo-vcusa.ru/lazy-load-placeholder.png"
+                          alt="Breadcrumb Trail Campground"
+                        />
+                      </div>
+                      <div className="recipe-add-title">
+                        + Create New Recipe
+                      </div>
                     </div>
                   </div>
                 </div>
               )}
             </div>
           </div>
+
+          <DraggableListExample />
         </div>
       </>
     );

@@ -7,6 +7,9 @@ import { Groceries } from "./groceries";
 import thunk from "redux-thunk";
 import logger from "redux-logger";
 
+import { createForms } from "react-redux-form";
+import { InitialRecipeDetails } from "./recipeDetailsForm";
+
 export const ConfigureStore = () => {
   const store = createStore(
     combineReducers({
@@ -14,6 +17,9 @@ export const ConfigureStore = () => {
       groceryCategories: GroceryCategories,
       recipes: Recipes,
       groceries: Groceries,
+      ...createForms({
+        recipeForm: InitialRecipeDetails,
+      }),
     }),
     applyMiddleware(thunk, logger)
   );

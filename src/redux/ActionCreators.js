@@ -462,20 +462,27 @@ export const modifyNewGrocery = (grocery) => ({
   payload: grocery,
 });
 
-export const postGrocery = (grocery) => (dispatch) => {
-  const newGrocery = {
-    grocery: {
-      ...grocery,
-      category: grocery.category.id,
-    },
-    custom_image: null,
-    detail: "",
-    user: 0,
-    timestamp: Date.now(),
-  };
-  dispatch(addNewGrocery(newGrocery));
+export const postGrocery = (grocery, addingAgain) => (dispatch) => {
+  let newGrocery = null;
+  if (!addingAgain) {
+    newGrocery = {
+      grocery: {
+        ...grocery,
+        category: grocery.category.id,
+      },
+      custom_image: null,
+      detail: "",
+      user: 0,
+      timestamp: Date.now(),
+    };
+  } else {
+    newGrocery = grocery;
+  }
 
-  return fetch(baseUrl + "grocery-instances", {
+  if (!addingAgain) dispatch(addNewGrocery(newGrocery));
+  else dispatch(addingGroceryAgain(grocery));
+
+  return fetch(baseUrl + `grocery-instances${addingAgain ? "" : "s"}`, {
     method: "POST",
     body: JSON.stringify(newGrocery),
     headers: {
@@ -500,10 +507,20 @@ export const postGrocery = (grocery) => (dispatch) => {
     )
     .then((response) => response.json())
     .then((response) => dispatch(modifyNewGrocery(response)))
-    .catch((error) => {
-      alert("Your grocery could not be posted\nError: " + error.message);
+    .catch(() => {
+      dispatch(addNewGroceryFailed(newGrocery));
     });
 };
+
+export const addingGroceryAgain = (grocery) => ({
+  type: ActionTypes.ADD_NEW_GROCERY_AGAIN,
+  payload: grocery,
+});
+
+export const addNewGroceryFailed = (newGrocery) => ({
+  type: ActionTypes.ADD_NEW_GROCERY_FAILED,
+  payload: newGrocery,
+});
 
 export const groceriesLoading = () => ({
   type: ActionTypes.GROCERY_INSTANCES_LOADING,
@@ -560,19 +577,95 @@ export const handleChangeNewGrocery = (v) => ({
   payload: v,
 });
 
-export const handleChooseGrocery = (grocery, ref) => (dispatch) => {
+export const handleChooseGrocery = (grocery) => (dispatch) => {
   dispatch(handleSectionChange(grocery.category.id));
   if (window.innerWidth < 992) dispatch(setSearchActive(false));
-  dispatch(postGrocery(grocery, ref));
+  dispatch(postGrocery(grocery));
 };
 
-export const handleSubmitNewGrocery = (grocery, ref) => (dispatch) => {
+export const handleSubmitNewGrocery = (grocery) => (dispatch) => {
   dispatch(handleSectionChange(grocery.category.id));
   if (window.innerWidth < 992) dispatch(setSearchActive(false));
-  dispatch(postGrocery(grocery, ref));
+  dispatch(postGrocery(grocery));
 };
 
 export const setHistory = (history) => ({
   type: ActionTypes.SET_HISTORY,
   payload: history,
+});
+
+export const handlePauseDetection = () => (dispatch) => {
+  dispatch(pauseDetection());
+  setTimeout(() => {
+    dispatch(resumeDetection());
+  }, 600);
+};
+
+export const pauseDetection = () => ({
+  type: ActionTypes.PAUSE_DETECTION,
+});
+
+export const resumeDetection = () => ({
+  type: ActionTypes.RESUME_DETECTION,
+});
+
+export const postRecipeIngredient =
+  (grocery, note, position, recipeId) => (dispatch) => {
+    const newRecipeIngredient = {
+      recipe: recipeId,
+      grocery: grocery,
+      detail: note,
+      position: position,
+    };
+
+    dispatch(addRecipeIngredient(newRecipeIngredient));
+  };
+
+export const addRecipeIngredient = (recipeIngredient) => ({
+  type: ActionTypes.ADD_RECIPE_INGREDIENT,
+  payload: recipeIngredient,
+});
+
+export const deleteRecipeIngredient = (index) => ({
+  type: ActionTypes.DELETE_RECIPE_INGREDIENT,
+  payload: index,
+});
+
+export const setIngredientToEdit = (ingredient) => ({
+  type: ActionTypes.SET_INGREDIENT_TO_EDIT,
+  payload: ingredient,
+});
+
+export const editIngredient = (grocery, note, position) => ({
+  type: ActionTypes.EDIT_INGREDIENT,
+  payload: {
+    recipe: null,
+    grocery: grocery,
+    detail: note,
+    position: position,
+  },
+});
+
+export const addPrepStep = (prepStep) => ({
+  type: ActionTypes.ADD_PREP_STEP,
+  payload: prepStep,
+});
+
+export const deletePrepStep = (index) => ({
+  type: ActionTypes.DELETE_PREP_STEP,
+  payload: index,
+});
+
+export const setPrepStepToEdit = (prepStep) => ({
+  type: ActionTypes.SET_PREP_STEP_TO_EDIT,
+  payload: prepStep,
+});
+
+export const editPrepStep = (title, description, position) => ({
+  type: ActionTypes.EDIT_PREP_STEP,
+  payload: {
+    title,
+    description,
+    position,
+  },
 });

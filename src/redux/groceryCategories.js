@@ -7,6 +7,7 @@ export const GroceryCategories = (
     groceryCategories: [],
     activeCat: 0,
     newGroceryName: "",
+    scrollActive: true,
   },
   action
 ) => {
@@ -45,8 +46,15 @@ export const GroceryCategories = (
 
     case ActionTypes.CLICK_CATEGORY:
       const scrollData = action.ref[`c${action.payload}`].current;
-      window.scrollTo(0, scrollData.offsetTop);
+      window.scrollTo(0, scrollData.offsetTop - window.innerHeight * 0.15);
+
       return { ...state, activeCat: action.payload };
+
+    case ActionTypes.PAUSE_DETECTION:
+      return { ...state, scrollActive: false };
+    case ActionTypes.RESUME_DETECTION:
+      return { ...state, scrollActive: true };
+
     default:
       return state;
   }

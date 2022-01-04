@@ -17,6 +17,7 @@ import {
   deleteGroceryInstance,
   fetchGroceryInstances,
   viewAllGroceryInstances,
+  handlePauseDetection,
 } from "../../redux/ActionCreators";
 
 import { connect } from "react-redux";
@@ -38,6 +39,7 @@ const mapDispatchToProps = {
   deleteGroceryInstance: (id) => deleteGroceryInstance(id),
   fetchGroceryInstances: () => fetchGroceryInstances(),
   viewAllGroceryInstances: (grocery) => viewAllGroceryInstances(grocery),
+  handlePauseDetection: () => handlePauseDetection(),
 };
 
 class Groceries extends Component {
@@ -48,6 +50,7 @@ class Groceries extends Component {
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
         20, 21, 22, 23,
       ],
+      scrollActive: true,
     };
   }
 
@@ -57,6 +60,10 @@ class Groceries extends Component {
       this.props.fetchGroceryInstances();
     }
   }
+
+  pauseDetection = () => {
+    this.props.handlePauseDetection();
+  };
   render() {
     const handleSectionVisible = (v, cat) => {
       if (v) {
@@ -98,6 +105,7 @@ class Groceries extends Component {
               </>
             ) : (
               <GroceryMenu
+                pauseDetection={this.pauseDetection}
                 groceryCategories={
                   this.props.groceryCategories.groceryCategories
                 }
@@ -184,6 +192,7 @@ class Groceries extends Component {
                       (category) => {
                         return (
                           <VisibilitySensor
+                            active={this.props.groceryCategories.scrollActive}
                             key={category.id}
                             onChange={(v) => handleSectionVisible(v, category)}
                             partialVisibility={true}

@@ -31,6 +31,7 @@ class SearchBar extends Component {
   state = {
     matchedSearchValue: null,
   };
+
   render() {
     const handleActivateSearch = (v) => {
       this.props.setSearchActive(v);
@@ -47,17 +48,31 @@ class SearchBar extends Component {
     const handleSearchClick = (e) => {
       if (e.code === "Enter") {
         if (this.state.matchedSearchValue) {
-          this.props.handleSubmitNewGrocery(
-            this.state.matchedSearchValue,
-            this.props.groceryInstances.refObj
-          );
+          if (this.props.recipeEditMode) {
+            this.props.setNewGroceryIngredientSelected(
+              this.state.matchedSearchValue
+            );
+            handleActivateSearch(false);
+          } else
+            this.props.handleSubmitNewGrocery(
+              this.state.matchedSearchValue,
+              this.props.groceryInstances.refObj
+            );
+
           handleChangeNewGrocery({ target: { value: "" } });
         }
         if (this.props.groceries.filteredGroceries.length === 1) {
-          this.props.handleSubmitNewGrocery(
-            this.props.groceries.filteredGroceries[0],
-            this.props.groceryInstances.refObj
-          );
+          if (this.props.recipeEditMode) {
+            this.props.setNewGroceryIngredientSelected(
+              this.props.groceries.filteredGroceries[0]
+            );
+            handleActivateSearch(false);
+          } else
+            this.props.handleSubmitNewGrocery(
+              this.props.groceries.filteredGroceries[0],
+              this.props.groceryInstances.refObj
+            );
+
           handleChangeNewGrocery({ target: { value: "" } });
         }
       } else if (e.code === "Escape") {
@@ -82,17 +97,45 @@ class SearchBar extends Component {
           </span>
         </label>
 
+        {this.props.recipeEditMode && this.props.newIngredientSelected.name ? (
+          <div className="selected-new-ingredient">
+            {this.props.newIngredientSelected.name}{" "}
+            <span
+              onClick={() => {
+                this.props.removeNewGroceryIngredientSelected();
+                handleChangeNewGrocery({ target: { value: "" } });
+                handleActivateSearch(true);
+              }}
+              className="remove-selected-new-ingredient"
+            >
+              x
+            </span>
+          </div>
+        ) : null}
         <input
           autocomplete="off"
-          onClick={() => handleActivateSearch(true)}
+          onClick={() => {
+            if (
+              this.props.newIngredientSelected &&
+              this.props.newIngredientSelected.name
+            ) {
+            } else handleActivateSearch(true);
+          }}
           id="ingredient2"
           type="text"
           className="form-control ingredient-search ingredient-search-input"
-          placeholder="Search for Ingredient"
+          placeholder={
+            this.props.recipeEditMode
+              ? this.props.newIngredientSelected.name
+                ? ""
+                : "Search for Ingredient"
+              : "Search for Ingredient"
+          }
           value={this.props.groceries.newGroceryName}
           onChange={handleChangeNewGrocery}
           onKeyDown={(e) => handleSearchClick(e)}
         ></input>
+
         <div
           className="input-group-append"
           onClick={
@@ -107,23 +150,29 @@ class SearchBar extends Component {
               : null
           }
         >
-          <a
-            className={`btn btn-ing-search ingredient-search ${
-              this.state.matchedSearchValue ||
-              this.props.groceries.filteredGroceries.length === 1
-                ? ""
-                : "btn-ing-search-inactive"
-            }`}
-          >
-            <span className="d-flex button-ing-text">+ Add</span>
-          </a>
+          {this.props.recipeEditMode ? null : (
+            <a
+              className={`btn btn-ing-search ingredient-search ${
+                this.state.matchedSearchValue ||
+                this.props.groceries.filteredGroceries.length === 1
+                  ? ""
+                  : "btn-ing-search-inactive"
+              }`}
+            >
+              <span className="d-flex button-ing-text">+ Add</span>
+            </a>
+          )}
         </div>
         {this.props.groceries.searchActive ? (
           <>
             {this.props.groceries.isLoading ? (
               <div className="search-box">Loading...</div>
             ) : (
-              <div className="search-box">
+              <div
+                className={`search-box ${
+                  this.props.recipeEditMode && "search-box-recipe-modal"
+                }`}
+              >
                 <div className="search-close-cont">
                   <div
                     className="search-close"
@@ -147,19 +196,28 @@ class SearchBar extends Component {
                           return (
                             <div className="mb-1 pb-2 ml-1 border-bottom added-item d-flex">
                               <span
-                                onClick={() =>
-                                  this.props.handleChooseGrocery(
-                                    g,
-                                    this.props.groceryInstances.refObj
-                                  )
-                                }
+                                onClick={() => {
+                                  if (this.props.recipeEditMode) {
+                                    this.props.setNewGroceryIngredientSelected(
+                                      g
+                                    );
+                                    handleActivateSearch(false);
+                                    handleChangeNewGrocery({
+                                      target: { value: "" },
+                                    });
+                                  } else
+                                    this.props.handleChooseGrocery(
+                                      g,
+                                      this.props.groceryInstances.refObj
+                                    );
+                                }}
                               >
-                                + {g.name}{" "}
+                                {this.props.recipeEditMode ? " " : "+"} {g.name}{" "}
                               </span>
 
                               {this.props.groceryInstances.groceryInstances.filter(
                                 (gI) => gI.grocery.id === g.id
-                              ).length ? (
+                              ).length && !this.props.recipeEditMode ? (
                                 <>
                                   <span className="grocery-search-qty">
                                     -{" "}

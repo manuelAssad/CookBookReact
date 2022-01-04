@@ -29,7 +29,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = {
   fetchGroceryInstances: () => fetchGroceryInstances(),
   fetchGroceryCategories: () => fetchGroceryCategories(),
-  postGrocery: (value, ref) => postGrocery(value, ref),
+  postGrocery: (value) => postGrocery(value),
   createRef: () => createRef(),
   fetchGroceries: () => fetchGroceries(),
   setSearchActive: (value) => setSearchActive(value),
@@ -59,10 +59,6 @@ class Main extends Component {
   };
 
   render() {
-    const RecipesComponent = (props) => {
-      return <Recipes history={props.history} />;
-    };
-
     return (
       <div>
         <Header
@@ -105,7 +101,11 @@ class Main extends Component {
               />
             )}
           />
-          <Route exact path="/recipes" component={RecipesComponent} />
+          <Route
+            exact
+            path="/recipes"
+            render={(props) => <Recipes history={props.history} />}
+          />
           <Redirect to="/home" />
         </Switch>
         <Footer />
