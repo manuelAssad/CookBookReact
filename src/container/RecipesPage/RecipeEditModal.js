@@ -12,6 +12,7 @@ import {
   filterGroceries,
   setIngredientToEdit,
   setPrepStepToEdit,
+  addNewRecipe,
 } from "../../redux/ActionCreators";
 
 import AddIngredientModal from "./AddIngredientModal";
@@ -20,10 +21,15 @@ import ImageUrlModal from "./ImageUrlModal";
 
 import { Control, Form, Errors } from "react-redux-form";
 
+const required = (val) => val && val.length;
+const maxLength = (len) => (val) => !val || val.length <= len;
+const minLength = (len) => (val) => val && val.length >= len;
+
 const RecipeEditModal = (props) => {
   const dispatch = useDispatch();
 
   const recipeFormDetails = useSelector((state) => state.recipeForm);
+  const recipeCategories = useSelector((state) => state.recipes.categories);
 
   const [addPrepStepModalOpen, setAddPrepStepModalOpen] = useState(false);
   const [addIngredientModalOpen, setAddIngredientModalOpen] = useState(false);
@@ -34,9 +40,105 @@ const RecipeEditModal = (props) => {
 
   const [prepStepsListModalOpen, setprepStepsListModalOpen] = useState(false);
 
+  const handleValidateForm = () => {
+    let formValid = true;
+
+    if (!recipeFormDetails.imageUrl) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.imageUrl", {
+          required: required(recipeFormDetails.imageUrl),
+        })
+      );
+      return formValid;
+    }
+
+    if (!recipeFormDetails.category.name) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.category", {
+          required: required(recipeFormDetails.category.name),
+        })
+      );
+      return formValid;
+    }
+
+    if (
+      !recipeFormDetails.cookTime &&
+      parseInt(recipeFormDetails.cookTime) !== 0
+    ) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.cookTime", {
+          required: required(""),
+        })
+      );
+      return formValid;
+    }
+
+    if (!recipeFormDetails.prepTime) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.prepTime", {
+          required: required(""),
+        })
+      );
+      return formValid;
+    }
+
+    if (!recipeFormDetails.ingredients.length) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.ingredients", {
+          required: required(recipeFormDetails.ingredients.length),
+        })
+      );
+      return formValid;
+    }
+
+    if (!recipeFormDetails.prepSteps.length) {
+      formValid = false;
+      dispatch(
+        actions.setValidity("recipeForm.prepSteps", {
+          required: required(recipeFormDetails.prepSteps.length),
+        })
+      );
+      return formValid;
+    }
+
+    return formValid;
+  };
+
+  const resetForm = () => {
+    dispatch(actions.reset("recipeForm"));
+  };
   const handleSubmit = (values) => {
-    alert("HI");
-    alert(JSON.stringify(values));
+    const formValid = handleValidateForm();
+    if (formValid) {
+      dispatch(addNewRecipe(values));
+      resetForm();
+    }
+  };
+
+  const handleChangeCategory = (e) => {
+    if (recipeCategories.filter((cat) => cat.id == e.target.value)[0]) {
+      dispatch(
+        actions.change(
+          "recipeForm.category",
+          recipeCategories.filter((cat) => cat.id == e.target.value)[0]
+        )
+      );
+      dispatch(
+        actions.setValidity("recipeForm.category", {
+          required: required("string"),
+        })
+      );
+    } else
+      dispatch(
+        actions.setValidity("recipeForm.category", {
+          required: required(""),
+        })
+      );
   };
   return (
     <div>
@@ -46,6 +148,14 @@ const RecipeEditModal = (props) => {
         setImageUrl={(url) =>
           dispatch(actions.change("recipeForm.imageUrl", url))
         }
+        setErrors={(value) =>
+          dispatch(
+            actions.setValidity("recipeForm.imageUrl", {
+              required: required(value),
+            })
+          )
+        }
+        imageUrl={recipeFormDetails.imageUrl}
       />
       <AddIngredientModal
         modalOpen={addIngredientModalOpen}
@@ -62,7 +172,15 @@ const RecipeEditModal = (props) => {
         }}
         ingredientsListModalOpen={ingredientsListModalOpen}
         setIngredientsListModalOpen={setIngredientsListModalOpen}
+        setErrors={(value) =>
+          dispatch(
+            actions.setValidity("recipeForm.ingredients", {
+              required: required(value),
+            })
+          )
+        }
       />
+
       <AddPrepStepModal
         modalOpen={addPrepStepModalOpen}
         toggleModal={() => {
@@ -75,6 +193,13 @@ const RecipeEditModal = (props) => {
         }}
         prepStepsListModalOpen={prepStepsListModalOpen}
         setprepStepsListModalOpen={setprepStepsListModalOpen}
+        setErrors={(value) =>
+          dispatch(
+            actions.setValidity("recipeForm.prepSteps", {
+              required: required(value),
+            })
+          )
+        }
       />
       <Modal isOpen={props.modalOpen}>
         <ModalHeader className="lightgreen-bg ">
@@ -99,6 +224,14 @@ const RecipeEditModal = (props) => {
                       class="recipe-modal-image img-fluid img-thumbnail"
                       alt="responsive image"
                     />
+                    <Errors
+                      model=".imageUrl"
+                      messages={{
+                        required: "Required",
+                      }}
+                      component="div"
+                      className="text-danger"
+                    />
                     <div
                       class="add-recipe-photo-text"
                       onClick={() => setImageUrlModalOpen(!imageUrlModalOpen)}
@@ -117,31 +250,47 @@ const RecipeEditModal = (props) => {
                           name="name"
                           placeholder="Recipe Name"
                           className="form-control"
+                          validators={{
+                            required,
+                            minLength: minLength(2),
+                            maxLength: maxLength(35),
+                          }}
+                        />
+                        <Errors
+                          show="touched"
+                          model=".name"
+                          messages={{
+                            required: "Required",
+                            minLength: "Must be atleast 2 characters",
+                            maxLength: "Must be 15 characters or less",
+                          }}
+                          component="div"
+                          className="text-danger"
                         />
                       </div>
                     </div>
 
                     <div class="form-row mt-3 row">
                       <div class="col-md-6">
-                        <Control.select
+                        <select
                           name="category"
-                          model=".category"
                           className="form-control mr-2 ml-md-0"
+                          onChange={(e) => handleChangeCategory(e)}
+                          value={recipeFormDetails.category.id}
                         >
-                          <option value={{}}>Select Category...</option>
-                          <option value={{ id: 0, name: "Main Course" }}>
-                            Main Course
-                          </option>
-                          <option value={{ id: 1, name: "Side Dish" }}>
-                            Side Dish
-                          </option>
-                          <option value={{ id: 2, name: "Dessert" }}>
-                            Dessert
-                          </option>
-                          <option value={{ id: 3, name: "Other" }}>
-                            Other
-                          </option>
-                        </Control.select>
+                          <option>Select Category...</option>
+                          {recipeCategories.map((cat) => {
+                            return <option value={cat.id}>{cat.name}</option>;
+                          })}
+                        </select>
+                        <Errors
+                          model=".category"
+                          messages={{
+                            required: "required",
+                          }}
+                          component="div"
+                          className="text-danger"
+                        />
                       </div>
 
                       <div class="col-12 col-md-6 d-flex align-self-start mt-3 mt-md-0">
@@ -197,24 +346,89 @@ const RecipeEditModal = (props) => {
                     <div class="form-row mt-3">
                       <div class="col-md-6 d-flex">
                         <span class="my-auto">Cook Time:</span>
-                        <Control.text
-                          model=".cookTime"
+                        <input
+                          type="number"
+                          min="0"
                           id="cookTime"
                           name="cookTime"
                           className="form-control ml-2 cook-time-input small-inputs-margin-1"
+                          onChange={(e) => {
+                            if (parseInt(e.target.value) <= 0) {
+                              dispatch(
+                                actions.change("recipeForm.cookTime", 0)
+                              );
+                            } else
+                              dispatch(
+                                actions.change(
+                                  "recipeForm.cookTime",
+                                  e.target.value
+                                )
+                              );
+                            dispatch(
+                              actions.setValidity("recipeForm.cookTime", {
+                                required: required("string"),
+                              })
+                            );
+                          }}
+                          value={recipeFormDetails.cookTime}
                         />
+
                         <span class="my-auto ml-2">min</span>
                       </div>
 
                       <div class="col-md-6 d-flex mt-2 mt-md-0">
                         <span class="my-auto ml-md-auto">Prep Time:</span>
-                        <Control.text
-                          model=".prepTime"
+                        <input
+                          type="number"
+                          min="1"
                           id="prepTime"
                           name="prepTime"
                           className="form-control ml-2 cook-time-input small-inputs-margin-1"
+                          onChange={(e) => {
+                            {
+                              if (parseInt(e.target.value) < 1) {
+                                dispatch(
+                                  actions.change("recipeForm.prepTime", "")
+                                );
+                              } else {
+                                dispatch(
+                                  actions.change(
+                                    "recipeForm.prepTime",
+                                    e.target.value
+                                  )
+                                );
+                                dispatch(
+                                  actions.setValidity("recipeForm.prepTime", {
+                                    required: required("string"),
+                                  })
+                                );
+                              }
+                            }
+                          }}
+                          value={recipeFormDetails.prepTime}
                         />
                         <span class="my-auto ml-2">min</span>
+                      </div>
+
+                      <div class="col-md-6 d-flex mt-2 mt-md-0">
+                        <Errors
+                          model=".cookTime"
+                          messages={{
+                            required: "required",
+                          }}
+                          component="div"
+                          className="text-danger "
+                        />
+                      </div>
+                      <div class="col-md-6 d-flex mt-2 mt-md-0">
+                        <Errors
+                          model=".prepTime"
+                          messages={{
+                            required: "required",
+                          }}
+                          component="div"
+                          className="text-danger ml-2"
+                        />
                       </div>
                     </div>
 
@@ -229,6 +443,14 @@ const RecipeEditModal = (props) => {
                         >
                           Add Ingredient{" "}
                         </div>
+                        <Errors
+                          model=".ingredients"
+                          messages={{
+                            required: "Atleast 1 ingredient required",
+                          }}
+                          component="div"
+                          className="text-danger position-absolute"
+                        />
                       </div>
 
                       <div class="col-12 col-md-6 mt-2 mt-md-0">
@@ -241,6 +463,14 @@ const RecipeEditModal = (props) => {
                         >
                           Add Preparation Step
                         </div>
+                        <Errors
+                          model=".prepSteps"
+                          messages={{
+                            required: "Atleast 1 prep step required",
+                          }}
+                          component="div"
+                          className="text-danger position-absolute"
+                        />
                       </div>
 
                       {!!recipeFormDetails.ingredients.length && (
@@ -289,12 +519,12 @@ const RecipeEditModal = (props) => {
                         </button>
                       </div>
                       <div class="col-6">
-                        <button
+                        <div
                           class="btn grocery-modal-button-2 hvr-grow"
                           onClick={props.toggleModal}
                         >
                           CANCEL
-                        </button>
+                        </div>
                       </div>
                     </div>
                   </div>

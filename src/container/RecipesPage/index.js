@@ -10,6 +10,7 @@ import {
   setHistory,
   setSearchActive,
   handleChangeNewGrocery,
+  changeRecipeCategory,
 } from "../../redux/ActionCreators";
 
 import { withRouter } from "react-router-dom";
@@ -35,6 +36,7 @@ const mapDispatchToProps = {
   fetchRecipeDetails: (id) => fetchRecipeDetails(id),
   setSearchActive: (v) => setSearchActive(v),
   handleChangeNewGrocery: (v) => handleChangeNewGrocery(v),
+  changeRecipeCategory: (category) => changeRecipeCategory(category),
 };
 
 class Recipes extends Component {
@@ -53,12 +55,18 @@ class Recipes extends Component {
     const searchObj = this.searchStringToObject(recipeCatinUrlFull);
     if (searchObj.category) {
       this.props.setRecipeCategory(searchObj.category);
+      this.props.changeRecipeCategory(
+        this.props.recipes.categories.filter(
+          (c) => c.id == searchObj.category
+        )[0]
+      );
       this.props.fetchRecipes(
         searchObj.category,
         this.props.recipes.categoriesFetched
       );
     } else {
       this.props.setRecipeCategory(null);
+      this.props.changeRecipeCategory({});
       this.props.fetchRecipes(null, this.props.recipes.categoriesFetched);
     }
   }
@@ -77,6 +85,25 @@ class Recipes extends Component {
 
   handleClickMenuItem = (id) => {
     this.props.history.push(`/recipes${id === null ? "" : `?category=${id}`}`);
+    this.props.setHistory(this.props.history);
+    const recipeCatinUrlFull = this.props.history.location.search;
+    const searchObj = this.searchStringToObject(recipeCatinUrlFull);
+    if (searchObj.category) {
+      this.props.setRecipeCategory(searchObj.category);
+      this.props.changeRecipeCategory(
+        this.props.recipes.categories.filter(
+          (c) => c.id == searchObj.category
+        )[0]
+      );
+      this.props.fetchRecipes(
+        searchObj.category,
+        this.props.recipes.categoriesFetched
+      );
+    } else {
+      this.props.setRecipeCategory(null);
+      this.props.changeRecipeCategory({});
+      this.props.fetchRecipes(null, this.props.recipes.categoriesFetched);
+    }
   };
 
   handleRecipeClick = (recipe) => {

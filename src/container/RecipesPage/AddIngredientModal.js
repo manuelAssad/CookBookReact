@@ -53,6 +53,7 @@ const AddIngredientModal = (props) => {
             null
           )
         );
+        props.setErrors("string");
       }
 
       props.setIngredientsListModalOpen(!props.ingredientsListModalOpen);
@@ -81,6 +82,7 @@ const AddIngredientModal = (props) => {
         }
         toggleAddModal={props.toggleModal}
         toggleEditModal={props.toggleEditModal}
+        setErrors={props.setErrors}
       />
       <Modal isOpen={props.modalOpen}>
         <ModalHeader className="lightgreen-bg ">
@@ -149,7 +151,10 @@ const AddIngredientModal = (props) => {
                           props.toggleModal();
                           if (recipeFormDetails.ingredientToEdit.grocery)
                             props.setIngredientsListModalOpen(true);
-                          else props.toggleEditModal();
+                          else {
+                            props.toggleEditModal();
+                            props.setErrors(recipeFormDetails.ingredients);
+                          }
                         }}
                       >
                         CANCEL

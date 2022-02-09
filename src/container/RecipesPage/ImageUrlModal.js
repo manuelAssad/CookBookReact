@@ -8,7 +8,9 @@ import { Fade } from "react-animation-components";
 import {} from "../../redux/ActionCreators";
 
 const AddIngredientModal = (props) => {
-  const dispatch = useDispatch();
+  useEffect(() => {
+    setImageUrl(props.imageUrl);
+  }, [props.imageUrl]);
 
   const [imageUrl, setImageUrl] = useState("");
   return (
@@ -44,6 +46,7 @@ const AddIngredientModal = (props) => {
                         onClick={() => {
                           props.setImageUrl(imageUrl);
                           props.toggleModal();
+                          props.setErrors(imageUrl);
                         }}
                       >
                         ADD IMAGE
@@ -52,7 +55,10 @@ const AddIngredientModal = (props) => {
                     <div className="col-6">
                       <button
                         className="btn grocery-modal-button-2"
-                        onClick={props.toggleModal}
+                        onClick={() => {
+                          props.toggleModal();
+                          props.setErrors(imageUrl);
+                        }}
                       >
                         CANCEL
                       </button>

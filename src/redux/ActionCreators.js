@@ -544,10 +544,16 @@ export const filterGroceries = (value) => ({
 export const fetchGroceries = () => (dispatch) => {
   dispatch(groceriesLoading());
 
-  return fetch(baseUrl + "groceries")
+  return fetch(baseUrl + "groceries", {
+    method: "OPTIONS",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
     .then(
       (response) => {
         if (response.ok) {
+          console.log("GROCERIESS", response);
           return response;
         } else {
           const error = new Error(
@@ -651,6 +657,11 @@ export const updateIngredientsList = (ingredients) => ({
   payload: ingredients,
 });
 
+export const updatePrepStepsList = (prepSteps) => ({
+  type: ActionTypes.UPGRADE_PREP_STEPS_LIST,
+  payload: prepSteps,
+});
+
 export const addPrepStep = (prepStep) => ({
   type: ActionTypes.ADD_PREP_STEP,
   payload: prepStep,
@@ -674,3 +685,33 @@ export const editPrepStep = (title, description, position) => ({
     position,
   },
 });
+
+export const changeRecipeCategory = (category) => ({
+  type: ActionTypes.CHANGE_RECIPE_CATEGORY,
+  payload: category,
+});
+
+export const addNewRecipe = (newRecipeDetails) => (dispatch) => {
+  console.log("DETAILSSS", newRecipeDetails);
+
+  const newRecipe = {
+    id: 0,
+    owner: {
+      name: "Manuel Assad",
+      avatar: null,
+    },
+    image:
+      "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2017/5/11/0/FNK_Pesto-Lasagna-Rolls-H_s4x3.jpg.rend.hgtvcom.966.725.suffix/1494520429705.jpeg",
+    image_detail:
+      "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2017/5/11/0/FNK_Pesto-Lasagna-Rolls-H_s4x3.jpg.rend.hgtvcom.966.725.suffix/1494520429705.jpeg",
+    title: "Main Course 1",
+    servings: 2,
+    cook_time: 20,
+    prep_time: 45,
+    recipe_category: {
+      name: "Main Courses",
+      id: 0,
+      user: null,
+    },
+  };
+};

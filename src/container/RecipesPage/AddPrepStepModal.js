@@ -31,7 +31,11 @@ const AddPrepStepModal = (props) => {
             recipeFormDetails.prepStepToEdit.position
           )
         );
-      else dispatch(addPrepStep({ title, description }));
+      else {
+        dispatch(addPrepStep({ title, description }));
+        props.setErrors("string");
+      }
+
       props.setprepStepsListModalOpen(!props.prepStepsListModalOpen);
       props.toggleModal();
     }
@@ -58,6 +62,7 @@ const AddPrepStepModal = (props) => {
         toggleAddModal={props.toggleModal}
         toggleEditModal={props.toggleEditModal}
         prepSteps={recipeFormDetails.prepSteps}
+        setErrors={props.setErrors}
       />
       <Modal isOpen={props.modalOpen}>
         <ModalHeader className="lightgreen-bg ">
@@ -120,7 +125,10 @@ const AddPrepStepModal = (props) => {
                           props.toggleModal();
                           if (recipeFormDetails.prepStepToEdit.title)
                             props.setprepStepsListModalOpen(true);
-                          else props.toggleEditModal();
+                          else {
+                            props.toggleEditModal();
+                            props.setErrors(recipeFormDetails.prepSteps);
+                          }
                         }}
                       >
                         CANCEL

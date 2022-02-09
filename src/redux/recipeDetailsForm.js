@@ -6,8 +6,8 @@ export const InitialRecipeDetails = (
     name: "",
     category: {},
     servings: 1,
-    cookTime: null,
-    prepTime: null,
+    cookTime: 0,
+    prepTime: 1,
     ingredients: [],
     prepSteps: [],
     ingredientToEdit: {},
@@ -43,6 +43,19 @@ export const InitialRecipeDetails = (
       return {
         ...state,
         ingredients: newList,
+      };
+
+    case ActionTypes.UPGRADE_PREP_STEPS_LIST:
+      const originalListP = [...action.payload];
+      const newListP = [];
+      originalListP.forEach((item, i) => {
+        const newItemP = item;
+        newItemP.position = i;
+        newListP.push(newItemP);
+      });
+      return {
+        ...state,
+        prepSteps: newListP,
       };
     case ActionTypes.DELETE_RECIPE_INGREDIENT:
       const ingredientsCopy = [...state.ingredients];
@@ -108,6 +121,13 @@ export const InitialRecipeDetails = (
       return {
         ...state,
         prepSteps: prepStepsCopyE,
+      };
+
+    case ActionTypes.CHANGE_RECIPE_CATEGORY:
+      console.log(action.payload, "CHANGE_RECIPE_CATEGORY");
+      return {
+        ...state,
+        category: action.payload,
       };
 
     default:

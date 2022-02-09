@@ -65,8 +65,10 @@ const RecipeDetailsModal = (props) => {
   };
 
   const handleAddAllIngredients = () => {
-    ingredientsList.forEach((ingredient) => {
-      handleIngredientAdd(ingredient);
+    ingredientsList.forEach((ingredient, i) => {
+      setTimeout(() => {
+        handleIngredientAdd(ingredient);
+      }, 250 * i);
     });
   };
 

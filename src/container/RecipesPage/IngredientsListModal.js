@@ -27,6 +27,7 @@ const DraggableList = (props) => {
       <IngredientsList
         toggleModal={props.toggleModal}
         toggleAddModal={props.toggleAddModal}
+        setErrors={props.setErrors}
       />
     </DndProvider>
   );
@@ -98,13 +99,9 @@ const IngredientCard = ({
         opacity,
       }}
     >
-      <div
-        className="col-12"
-        onMouseDown={() => console.log("Hi")}
-        onMouseUp={() => console.log("Hello")}
-      >
+      <div className="col-12">
         <div className="row">
-          <div className="col" onMouseUp={() => console.log("Hello")}>
+          <div className="col">
             <i
               className="fa fa-edit hvr-grow"
               onClick={() => handleEditIngredient(ing)}
@@ -140,11 +137,11 @@ const IngredientsList = (props) => {
 
   const handleDeleteIngredient = (i) => {
     dispatch(deleteRecipeIngredient(i));
-    setCards(
-      update(cards, {
-        $splice: [[i, 1]],
-      })
-    );
+    const newCards = update(cards, {
+      $splice: [[i, 1]],
+    });
+    setCards(newCards);
+    props.setErrors(newCards);
   };
 
   const [, drop] = useDrop(() => ({ accept: ItemTypes.CARD }));
@@ -235,6 +232,7 @@ const IngredientsListModal = (props) => {
             <DraggableList
               toggleModal={props.toggleModal}
               toggleAddModal={props.toggleAddModal}
+              setErrors={props.setErrors}
             />
           </Fade>
         </ModalBody>
