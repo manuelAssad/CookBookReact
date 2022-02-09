@@ -545,7 +545,8 @@ export const fetchGroceries = () => (dispatch) => {
   dispatch(groceriesLoading());
 
   return fetch(baseUrl + "groceries", {
-    method: "OPTIONS",
+    method: "POST",
+    body: JSON.stringify({ name: "Cheese16" }),
     headers: {
       "Content-Type": "application/json",
     },
