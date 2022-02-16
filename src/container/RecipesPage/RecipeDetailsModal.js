@@ -31,13 +31,12 @@ import RetryLottie from "./RetryLottie";
 import AddLottie from "./AddLottie";
 import { addIngredientToList, postGrocery } from "../../redux/ActionCreators";
 
+import { baseUrl } from "../../shared/baseUrl";
+
 const RecipeDetailsModal = (props) => {
   const dispatch = useDispatch();
 
-  const isLoading = useSelector(
-    (state) =>
-      state.recipes.recipeIngredientsLoading || state.recipes.recipeStepsLoading
-  );
+  const isLoading = useSelector((state) => state.recipes.recipeDetailsLoading);
 
   const failedToFetch = useSelector(
     (state) =>
@@ -118,7 +117,7 @@ const RecipeDetailsModal = (props) => {
               <div class="row justify-content-center">
                 <div class="col-12">
                   <img
-                    src={props.recipeOpen.image}
+                    src={`${baseUrl}/${props.recipeOpen.image}`}
                     class="recipe-modal-image img-fluid img-thumbnail"
                     alt="responsive image"
                   />
@@ -188,13 +187,13 @@ const RecipeDetailsModal = (props) => {
 
                                   {console.log(
                                     "COMAPREEE",
-                                    ingredient.id,
+                                    ingredient._id,
                                     ingredientToBeAdded
                                   )}
                                   <div
                                     onMouseEnter={
                                       ingredient.addingToListStatus === "failed"
-                                        ? () => setRetryHover(ingredient.id)
+                                        ? () => setRetryHover(ingredient._id)
                                         : null
                                     }
                                     onMouseLeave={
@@ -212,13 +211,13 @@ const RecipeDetailsModal = (props) => {
                                       <CheckMarkLottie />
                                     ) : ingredient.addingToListStatus ===
                                       "failed" ? (
-                                      retryHover === ingredient.id ? (
+                                      retryHover === ingredient._id ? (
                                         <RetryLottie />
                                       ) : (
                                         <ErrorLottie />
                                       )
                                     ) : null}
-                                    {addHover === ingredient.id ? (
+                                    {addHover === ingredient._id ? (
                                       <AddLottie />
                                     ) : null}
                                     <div
@@ -226,7 +225,7 @@ const RecipeDetailsModal = (props) => {
                                       style={{
                                         opacity:
                                           ingredient.addingToListStatus ||
-                                          addHover === ingredient.id
+                                          addHover === ingredient._id
                                             ? 0
                                             : 1,
                                       }}
@@ -235,7 +234,7 @@ const RecipeDetailsModal = (props) => {
                                       }
                                       onMouseEnter={
                                         !ingredient.addingToListStatus
-                                          ? () => setAddHover(ingredient.id)
+                                          ? () => setAddHover(ingredient._id)
                                           : null
                                       }
                                       onMouseLeave={() => setAddHover(null)}

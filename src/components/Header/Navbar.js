@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   handleClickCategory,
   handlePauseDetection,
+  loginUser,
+  logoutUser,
+  signupUser,
 } from "../../redux/ActionCreators";
 
 import {
@@ -16,17 +19,24 @@ import {
   NavItem,
   NavLink,
   NavbarText,
+  Modal,
 } from "reactstrap";
 
 import { NavLink as NavLinkR } from "react-router-dom";
 
 import SearchBar from "../SearchBar";
 import MobileTabs from "../MobileTabs";
+import ModalHeader from "reactstrap/lib/ModalHeader";
+import ModalBody from "reactstrap/lib/ModalBody";
+import Button from "reactstrap/lib/Button";
 
 const NavbarComponent = (props) => {
   const groceryCategories = useSelector((state) => state.groceryCategories);
   const groceryInstances = useSelector((state) => state.groceryInstances);
   const recipes = useSelector((state) => state.recipes);
+
+  const auth = useSelector((state) => state.auth);
+
   const dispatch = useDispatch();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -45,12 +55,21 @@ const NavbarComponent = (props) => {
     setIsOpen(false);
   };
 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [password2, setPassword2] = useState("");
+  const [error, setError] = useState("");
+  const [signUpModalVisible, setSignUpModalVisible] = useState(false);
+
+  const [signInModalVisible, setSignInModalVisible] = useState(false);
+  const [errorLogin, setErrorLogin] = useState("");
+
   useEffect(() => {
     const mobileTabsDataCalc = [];
     groceryCategories.groceryCategories.forEach((gc) => {
       if (
         groceryInstances.groceryInstances.filter(
-          (gI) => gI.grocery.category === gc.id
+          (gI) => gI.grocery.category === gc._id
         ).length
       ) {
         mobileTabsDataCalc.push(gc);
@@ -62,7 +81,7 @@ const NavbarComponent = (props) => {
     // groceryCategories.groceryCategories.forEach((gc) => {
     //   if (
     //     groceryInstances.groceryInstances.filter(
-    //       (gI) => gI.grocery.category === gc.id
+    //       (gI) => gI.grocery.category === gc._id
     //     ).length
     //   ) {
     //     mobileTabsDataCalc.push(gc);
@@ -84,16 +103,177 @@ const NavbarComponent = (props) => {
   const handleRecipeTabClick = (id) => {
     recipes.history.push(`/recipes${id !== null ? `?category=${id}` : ""}`);
   };
+
+  const handleClickLoginoutButton = () => {
+    if (auth.user) {
+      dispatch(logoutUser());
+      window.location.href = "/";
+    } else {
+      setSignInModalVisible(true);
+    }
+  };
+
+  const handleSignupButton = () => {
+    setSignUpModalVisible(true);
+  };
+
+  const handleSignUp = () => {
+    let error = null;
+    if (!username) {
+      error = "username required";
+    } else if (!password) {
+      error = "no password provided";
+    } else if (password2 !== password) {
+      error = "passwords don't match";
+    }
+
+    setError(error);
+
+    if (!error) {
+      dispatch(
+        signupUser({ username, password }, setSignUpModalVisible, setError)
+      );
+      setError("");
+    }
+  };
+
+  const handleSignIn = () => {
+    let error = null;
+    if (!username) {
+      error = "username required";
+    } else if (!password) {
+      error = "password missing";
+    }
+
+    setErrorLogin(error);
+
+    if (!error) {
+      dispatch(
+        loginUser({ username, password }, setSignInModalVisible, setErrorLogin)
+      );
+      setErrorLogin("");
+    }
+  };
   return (
     <>
+      <Modal isOpen={signUpModalVisible}>
+        <ModalHeader>Signup</ModalHeader>
+        <ModalBody>
+          <div className="d-flex justify-content-center">
+            <label className="col-5 mt-1" for="username">
+              Username:
+            </label>
+            <div className="col-7">
+              <input
+                className="form-control"
+                id="username"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="d-flex justify-content-center mt-3">
+            <label className="col-5 mt-1" for="password">
+              Password:
+            </label>
+            <div className="col-7">
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="d-flex justify-content-center mt-3">
+            <label className="col-5 mt-1" for="reenter-password">
+              Re-enter Password:
+            </label>
+            <div className="col-7">
+              <input
+                type="password"
+                className="form-control"
+                id="reenter-password"
+                placeholder="password"
+                value={password2}
+                onChange={(e) => setPassword2(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="text-danger mt-2 ml-2">{error}</div>
+          <div className="d-flex justify-content-center mt-3">
+            <Button className="w-100 m-2 btn-color2 btn" onClick={handleSignUp}>
+              SIGNUP
+            </Button>
+            <Button
+              className="w-100 m-2 btn-danger btn"
+              onClick={() => setSignUpModalVisible(false)}
+            >
+              CANCEL
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
+
+      <Modal isOpen={signInModalVisible}>
+        <ModalHeader>Login</ModalHeader>
+        <ModalBody>
+          <div className="d-flex justify-content-center">
+            <label className="col-5 mt-1" for="username">
+              Username:
+            </label>
+            <div className="col-7">
+              <input
+                className="form-control"
+                id="username"
+                placeholder="username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="d-flex justify-content-center mt-3">
+            <label className="col-5 mt-1" for="password">
+              Password:
+            </label>
+            <div className="col-7">
+              <input
+                type="password"
+                className="form-control"
+                id="password"
+                placeholder="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="text-danger mt-2 ml-2">{errorLogin}</div>
+          <div className="d-flex justify-content-center mt-3">
+            <Button className="w-100 m-2 btn-color2 btn" onClick={handleSignIn}>
+              LOGIN
+            </Button>
+            <Button
+              className="w-100 m-2 btn-danger btn"
+              onClick={() => setSignInModalVisible(false)}
+            >
+              CANCEL
+            </Button>
+          </div>
+        </ModalBody>
+      </Modal>
       <div>
+        {console.log("AUTHHHHHH", auth)}
         <Navbar fixed="top" light expand="lg" className="navbar-dark">
           <a className="navbar-brand hvr-grow" href="#homeSection">
             COOK<span className="navbar-brand-light">BOOK</span>
           </a>
           <NavbarToggler onClick={toggle} />
           <Collapse isOpen={isOpen} navbar>
-            <Nav className="mx-auto" navbar>
+            <Nav className="ml-auto" navbar>
               <NavItem
                 className={`nav-item px-3 px-lg-0 pr-lg-3 mb-3 mb-lg-0 ${
                   props.currentSection === 0 && isHomePage ? "active" : ""
@@ -116,24 +296,32 @@ const NavbarComponent = (props) => {
                   </NavLinkR>
                 )}
               </NavItem>
-              <NavItem className={`nav-item px-3 px-lg-3 pr-lg-3 mb-3 mb-lg-0`}>
-                <NavLinkR
-                  onClick={() => handleNavItemClick("groceries")}
-                  className="nav-link"
-                  to="/groceries"
-                >
-                  My List
-                </NavLinkR>
-              </NavItem>
-              <NavItem className={`nav-item px-3 px-lg-3 pr-lg-3 mb-3 mb-lg-0`}>
-                <NavLinkR
-                  className="nav-link"
-                  to="/recipes"
-                  onClick={() => handleNavItemClick("recipes")}
-                >
-                  Recipes
-                </NavLinkR>
-              </NavItem>
+              {auth.user && (
+                <>
+                  <NavItem
+                    className={`nav-item px-3 px-lg-3 pr-lg-3 mb-3 mb-lg-0`}
+                  >
+                    <NavLinkR
+                      onClick={() => handleNavItemClick("groceries")}
+                      className="nav-link"
+                      to="/groceries"
+                    >
+                      My List
+                    </NavLinkR>
+                  </NavItem>
+                  <NavItem
+                    className={`nav-item px-3 px-lg-3 pr-lg-3 mb-3 mb-lg-0`}
+                  >
+                    <NavLinkR
+                      className="nav-link"
+                      to="/recipes"
+                      onClick={() => handleNavItemClick("recipes")}
+                    >
+                      Recipes
+                    </NavLinkR>
+                  </NavItem>
+                </>
+              )}
               {isHomePage ? (
                 <>
                   <NavItem
@@ -155,14 +343,27 @@ const NavbarComponent = (props) => {
                 </>
               ) : null}
             </Nav>
-            <NavbarText className="ml-lg-auto pr-5 hvr-grow">
+            <NavbarText className="ml-lg-auto pr-5">
+              {auth.user ? (
+                <span style={{ marginRight: 15 }}>
+                  Hey, {auth.user.username}
+                </span>
+              ) : null}
+              {!auth.user && (
+                <a
+                  onClick={handleSignupButton}
+                  className="btn btn-color1 mr-2 hvr-grow"
+                >
+                  <i className="fa fa-sign-up" style={{ marginRight: 5 }}></i>
+                  SIGNUP
+                </a>
+              )}
               <a
-                role="button"
-                data-toggle="modal"
-                data-target="#loginModal"
-                className="btn btn-color1"
+                onClick={handleClickLoginoutButton}
+                className="btn btn-color1 hvr-grow"
               >
-                <i className="fa fa-sign-in"></i> LOGOUT
+                <i className="fa fa-sign-in" style={{ marginRight: 5 }}></i>
+                {auth.user ? "LOGOUT" : "LOGIN"}
               </a>
             </NavbarText>
           </Collapse>

@@ -30,7 +30,8 @@ export const GroceryCategories = (
       return { ...state, isLoading: false, errMess: action.payload };
 
     case ActionTypes.CATEGORY_SECTION_CHANGE:
-      const categoryId = state.groceryCategories[action.payload].id;
+      console.log(action.payload, "groceryCategoriesgroceryCategories");
+      const categoryId = action.payload;
       if (
         document.getElementById(`mobile-tab-groceryCategories-${categoryId}`)
       ) {

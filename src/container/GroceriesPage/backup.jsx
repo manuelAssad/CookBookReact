@@ -65,12 +65,13 @@
           {this.props.groceryCategories.map((cat) => {
             return (
               <div>
-                {this.props.groceriesList.filter((g) => g.category.id == cat.id)
-                  .length ? (
+                {this.props.groceriesList.filter(
+                  (g) => g.category._id == cat._id
+                ).length ? (
                   <div className="search-cat">{cat.name}</div>
                 ) : null}
                 {this.props.groceriesList
-                  .filter((grocery) => grocery.category.id === cat.id)
+                  .filter((grocery) => grocery.category._id === cat._id)
                   .map((g) => {
                     return (
                       <div

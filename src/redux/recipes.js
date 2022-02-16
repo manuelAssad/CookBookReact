@@ -3,25 +3,23 @@ import * as ActionTypes from "./ActionTypes";
 export const Recipes = (
   state = {
     isLoading: true,
+    isLoadingCategories: true,
     errMess: null,
     recipes: [],
     filteredRecipes: [],
     categoriesFetched: [],
-    categories: [
-      { id: 0, name: "Main Courses" },
-      { id: 1, name: "Side Dishes" },
-      { id: 2, name: "Desserts" },
-    ],
+    categories: [],
     activeRecipeCategory: null,
     history: {},
-
+    recipeDetailsLoading: true,
     recipeIngredients: [],
-    recipeIngredientsLoading: false,
-    recipeIngredientsFailed: false,
     recipeSteps: [],
-    recipeStepsLoading: false,
-    recipeStepsFailed: false,
     shouldRefetch: false,
+    addingNewRecipeFailed: false,
+    addingNewRecipeLoading: false,
+    addedNewRecipe: false,
+    editedRecipe: false,
+    deletedRecipe: false,
   },
   action
 ) => {
@@ -41,6 +39,19 @@ export const Recipes = (
       return { ...state, isLoading: true, errMess: null };
     case ActionTypes.RECIPES_FAILED:
       return { ...state, isLoading: false, errMess: action.payload };
+
+    case ActionTypes.ADD_RECIPE_CATEGORIES:
+      return {
+        ...state,
+        isLoadingCategories: false,
+        errMess: null,
+        categories: action.payload,
+      };
+    case ActionTypes.RECIPE_CATEGORIES_LOADING:
+      return { ...state, isLoadingCategories: true, errMess: null };
+    case ActionTypes.RECIPE_CATEGORIES_FAILED:
+      return { ...state, isLoadingCategories: false, errMess: action.payload };
+
     case ActionTypes.SET_RECIPES_CATEGORIES_FETCHED:
       const categoriesFetchedCopy = state.categoriesFetched;
       if (action.payload === null) {
@@ -61,7 +72,7 @@ export const Recipes = (
         filteredRecipesDraft = state.recipes;
       } else {
         filteredRecipesDraft = recipesCopy.filter(
-          (recipe) => recipe.recipe_category.id == action.payload
+          (recipe) => recipe.recipe_category._id == action.payload
         );
       }
 
@@ -80,60 +91,27 @@ export const Recipes = (
       }
       return { ...state, activeRecipeCategory: action.payload };
 
-    case ActionTypes.RECIPE_INGREDIENTS_FAILED:
+    case ActionTypes.ADD_RECIPE_DETAILS:
       return {
         ...state,
-        recipeIngredients: [],
-        recipeIngredientsLoading: false,
-        recipeIngredientsFailed: true,
+        recipeIngredients: action.payload.ingredients,
+        recipeSteps: action.payload.prep_steps,
+        recipeDetailsLoading: false,
       };
-    case ActionTypes.RECIPE_INGREDIENTS_LOADING:
+    case ActionTypes.RECIPE_DETAILS_LOADING:
       return {
         ...state,
-        recipeIngredients: [],
-        recipeIngredientsLoading: true,
-        recipeIngredientsFailed: false,
-      };
-    case ActionTypes.ADD_RECIPE_INGREDIENTS:
-      console.log("RECIPE INGREDIENTSSS", action.payload);
-      return {
-        ...state,
-        recipeIngredients: action.payload,
-        recipeIngredientsLoading: false,
-        recipeIngredientsFailed: false,
-      };
-
-    case ActionTypes.RECIPE_STEPS_FAILED:
-      return {
-        ...state,
-        recipeSteps: [],
-        recipeStepsLoading: false,
-        recipeStepsFailed: true,
+        recipeDetailsLoading: true,
       };
     case ActionTypes.UNSET_REFETCH:
       return {
         ...state,
         shouldRefetch: false,
       };
-    case ActionTypes.RECIPE_STEPS_LOADING:
-      return {
-        ...state,
-        recipeSteps: [],
-        recipeStepsLoading: true,
-        recipeStepsFailed: false,
-      };
-    case ActionTypes.ADD_RECIPE_STEPS:
-      console.log("RECIPE STEPSSS", action.payload);
-      return {
-        ...state,
-        recipeSteps: action.payload,
-        recipeStepsLoading: false,
-        recipeStepsFailed: false,
-      };
 
     case ActionTypes.SHOULD_ADD_INGREDIENT_TO_LIST:
       const indexOfIngredient = state.recipeIngredients.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       const recipeIngredientsCopy = [...state.recipeIngredients];
@@ -149,7 +127,7 @@ export const Recipes = (
 
     case ActionTypes.SUCCESSFULLY_ADDED_INGREDIENT_TO_LIST:
       const indexOfIngredient2 = state.recipeIngredients.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       const recipeIngredientsCopy2 = [...state.recipeIngredients];
@@ -166,7 +144,7 @@ export const Recipes = (
 
     case ActionTypes.FAILED_ADDING_INGREDIENT_TO_LIST:
       const indexOfIngredient3 = state.recipeIngredients.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       const recipeIngredientsCopy3 = [...state.recipeIngredients];
@@ -182,6 +160,137 @@ export const Recipes = (
 
     case ActionTypes.SET_HISTORY:
       return { ...state, history: action.payload };
+
+    case ActionTypes.ADD_NEW_RECIPE:
+      const activeCategory = state.activeRecipeCategory;
+      const filteredRecipesCopy = [...state.filteredRecipes];
+      console.log(action.payload, activeCategory, "MUSTBESAMEEE");
+      if (
+        activeCategory === action.payload.recipe_category._id ||
+        !activeCategory
+      ) {
+        filteredRecipesCopy.push({ ...action.payload, new: true });
+      }
+
+      return {
+        ...state,
+        recipes: state.recipes.concat({ ...action.payload, new: true }),
+        filteredRecipes: filteredRecipesCopy,
+        addingNewRecipeFailed: false,
+        addingNewRecipeLoading: false,
+        addedNewRecipe: true,
+      };
+
+    case ActionTypes.EDIT_RECIPE:
+      const filteredRecipesCopy2 = [...state.filteredRecipes];
+      const recipesCopy2 = [...state.recipes];
+
+      const filteredIndex = filteredRecipesCopy2.findIndex(
+        (recipe) => recipe._id == action.payload.recipe._id
+      );
+      const index = recipesCopy2.findIndex(
+        (recipe) => recipe._id == action.payload.recipe._id
+      );
+
+      if (filteredIndex !== -1) {
+        console.log("FFFFTTTTPPPP", filteredRecipesCopy2, action.payload);
+        filteredRecipesCopy2.splice(filteredIndex, 1);
+        filteredRecipesCopy2.splice(filteredIndex, 0, action.payload.recipe);
+      }
+
+      if (index !== -1) {
+        console.log("FFFFTTTTPPPP22", recipesCopy2, action.payload);
+        recipesCopy2.splice(index, 1);
+        recipesCopy2.splice(index, 0, action.payload.recipe);
+      }
+
+      return {
+        ...state,
+        recipes: recipesCopy2,
+        filteredRecipes: filteredRecipesCopy2,
+        addingNewRecipeFailed: false,
+        addingNewRecipeLoading: false,
+        editedRecipe: true,
+      };
+
+    case ActionTypes.DELETING_RECIPE_LOADING:
+      const filteredRecipesCopy4 = [...state.filteredRecipes];
+      const recipesCopy4 = [...state.recipes];
+
+      const filteredIndex1 = filteredRecipesCopy4.findIndex(
+        (recipe) => recipe._id == action.payload
+      );
+      const index2 = recipesCopy4.findIndex(
+        (recipe) => recipe._id == action.payload
+      );
+
+      if (filteredIndex1 !== -1) {
+        const newFileteredRecipeItem = {
+          ...filteredRecipesCopy4[filteredIndex1],
+        };
+        filteredRecipesCopy4.splice(filteredIndex1, 1);
+        newFileteredRecipeItem.deleting = true;
+        console.log(
+          newFileteredRecipeItem,
+          "newFileteredRecipeItemnewFileteredRecipeItem"
+        );
+        filteredRecipesCopy4.splice(filteredIndex1, 0, newFileteredRecipeItem);
+      }
+
+      if (index2 !== -1) {
+        const newRecipeItem = {
+          ...recipesCopy4[index2],
+        };
+        recipesCopy4.splice(index2, 1);
+        newRecipeItem.deleting = true;
+        console.log(newRecipeItem, "newRecipeItemnewRecipeItem");
+        recipesCopy4.splice(index2, 0, newRecipeItem);
+      }
+
+      return {
+        ...state,
+        recipes: recipesCopy4,
+        filteredRecipes: filteredRecipesCopy4,
+      };
+
+    case ActionTypes.DELETE_RECIPE:
+      const filteredRecipesCopy3 = [...state.filteredRecipes];
+      const recipesCopy3 = [...state.recipes];
+
+      const newFilteredRecipes = filteredRecipesCopy3.filter(
+        (recipe) => recipe._id !== action.payload._id
+      );
+      const newRecipes = recipesCopy3.filter(
+        (recipe) => recipe._id !== action.payload._id
+      );
+
+      return {
+        ...state,
+        recipes: newRecipes,
+        filteredRecipes: newFilteredRecipes,
+        deletedRecipe: true,
+      };
+
+    case ActionTypes.DISMISS_ALERT:
+      return {
+        ...state,
+        addedNewRecipe: false,
+        editedRecipe: false,
+        deletedRecipe: false,
+      };
+
+    case ActionTypes.ADD_NEW_RECIPE_FAILED:
+      return {
+        ...state,
+        addingNewRecipeLoading: false,
+        addingNewRecipeFailed: true,
+      };
+    case ActionTypes.ADD_NEW_RECIPE_LOADING:
+      return {
+        ...state,
+        addingNewRecipeLoading: true,
+        addingNewRecipeFailed: false,
+      };
     default:
       return state;
   }

@@ -1,31 +1,42 @@
 import * as ActionTypes from "./ActionTypes";
 import { baseUrl } from "../shared/baseUrl";
 
+const bearer = "Bearer " + localStorage.getItem("token");
+
 export const fetchGroceryInstances = () => (dispatch) => {
   dispatch(unSetShouldRefetch());
   dispatch(groceryInstancesLoading());
-
-  return fetch(baseUrl + "grocery-instances")
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          const error = new Error(
-            `Error ${response.status}: ${response.statusText}`
-          );
-          error.response = response;
-          throw error;
-        }
+  setTimeout(() => {
+    return fetch(baseUrl + "grocery-instances", {
+      method: "GET",
+      headers: {
+        Authorization: bearer,
       },
-      (error) => {
-        const errMess = new Error(error.message);
-        throw errMess;
-      }
-    )
-    .then((response) => response.json())
-    .then((groceryInstances) => dispatch(addGroceryInstances(groceryInstances)))
-    .catch((error) => dispatch(groceryInstancesFailed(error.message)));
+    })
+      .then(
+        (response) => {
+          if (response.ok) {
+            console.log(response, "grocery-instances");
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
+          const errMess = new Error(error.message);
+          throw errMess;
+        }
+      )
+      .then((response) => response.json())
+      .then((groceryInstances) =>
+        dispatch(addGroceryInstances(groceryInstances))
+      )
+      .catch((error) => dispatch(groceryInstancesFailed(error.message)));
+  }, 1000);
 };
 
 export const groceryInstancesLoading = () => ({
@@ -59,13 +70,14 @@ export const crossOutGroceryInstanceInServer =
       crossed: !groceryInstance.crossed,
     };
 
-    dispatch(crossOutGroceryInstance(groceryInstance.id));
+    dispatch(crossOutGroceryInstance(groceryInstance._id));
 
-    return fetch(baseUrl + `grocery-instances/${groceryInstance.id}`, {
+    return fetch(baseUrl + `grocery-instances/${groceryInstance._id}`, {
       method: "PUT",
       body: JSON.stringify(newGroceryInstances),
       headers: {
         "Content-Type": "application/json",
+        Authorization: bearer,
       },
     })
       .then(
@@ -98,36 +110,39 @@ export const updatedGroceryInstanceDetail =
     };
     dispatch(shouldUpdatedGroceryInstanceDetail(newGroceryInstance));
 
-    return fetch(baseUrl + `grocery-instances/${groceryInstance.id}`, {
-      method: "PUT",
-      body: JSON.stringify(newGroceryInstance),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then(
-        (response) => {
-          if (response.ok) {
-            return response;
-          } else {
-            const error = new Error(
-              `Error ${response.status}: ${response.statusText}`
-            );
-            error.response = response;
+    setTimeout(() => {
+      return fetch(baseUrl + `grocery-instances/${groceryInstance._id}`, {
+        method: "PUT",
+        body: JSON.stringify(newGroceryInstance),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: bearer,
+        },
+      })
+        .then(
+          (response) => {
+            if (response.ok) {
+              return response;
+            } else {
+              const error = new Error(
+                `Error ${response.status}: ${response.statusText}`
+              );
+              error.response = response;
+              throw error;
+            }
+          },
+          (error) => {
             throw error;
           }
-        },
-        (error) => {
-          throw error;
-        }
-      )
-      .then((response) => response.json())
-      .then((groceryInstance) =>
-        dispatch(successfullyUpdatedGroceryInstanceDetail(groceryInstance))
-      )
-      .catch((error) => {
-        dispatch(failedUpdatingGroceryDetail(groceryInstance));
-      });
+        )
+        .then((response) => response.json())
+        .then((groceryInstance) =>
+          dispatch(successfullyUpdatedGroceryInstanceDetail(groceryInstance))
+        )
+        .catch((error) => {
+          dispatch(failedUpdatingGroceryDetail(groceryInstance));
+        });
+    }, 1000);
   };
 
 export const shouldUpdatedGroceryInstanceDetail = (groceryInstance) => ({
@@ -162,6 +177,7 @@ export const deleteGroceryInstance = (id) => (dispatch) => {
     method: "DELETE",
     headers: {
       "Content-Type": "application/json",
+      Authorization: bearer,
     },
   })
     .then(
@@ -188,7 +204,11 @@ export const deleteGroceryInstance = (id) => (dispatch) => {
 export const fetchGroceryCategories = () => (dispatch) => {
   dispatch(groceryCategoriesLoading());
 
-  return fetch(baseUrl + "grocery-categories")
+  return fetch(baseUrl + "grocery-categories", {
+    headers: {
+      Authorization: bearer,
+    },
+  })
     .then(
       (response) => {
         if (response.ok) {
@@ -207,9 +227,10 @@ export const fetchGroceryCategories = () => (dispatch) => {
       }
     )
     .then((response) => response.json())
-    .then((groceryCategories) =>
-      dispatch(addGroceryCategories(groceryCategories))
-    )
+    .then((groceryCategories) => {
+      dispatch(addGroceryCategories(groceryCategories));
+      dispatch(createRef(groceryCategories));
+    })
     .catch((error) => dispatch(groceryCategoriesFailed(error.message)));
 };
 
@@ -238,17 +259,100 @@ export const handleSectionChange = (categoryId) => ({
   payload: categoryId,
 });
 
+export const fetchRecipeCategories = () => (dispatch) => {
+  dispatch(recipeCategoriesLoading());
+  return fetch(baseUrl + `recipe-categories`, {
+    headers: {
+      Authorization: bearer,
+    },
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        const errMess = new Error(error.message);
+        throw errMess;
+      }
+    )
+    .then((response) => response.json())
+    .then((ingredients) => dispatch(addRecipeCategories(ingredients)))
+    .catch((error) => dispatch(recipeCategoriesFailed(error.message)));
+};
+
+export const addRecipeCategories = (categories) => ({
+  type: ActionTypes.ADD_RECIPE_CATEGORIES,
+  payload: categories,
+});
+
+export const recipeCategoriesFailed = (err) => ({
+  type: ActionTypes.RECIPE_CATEGORIES_FAILED,
+  payload: err,
+});
+
+export const recipeCategoriesLoading = (err) => ({
+  type: ActionTypes.RECIPE_CATEGORIES_LOADING,
+  payload: err,
+});
+
 export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
   //if fetched a certain category or all categories don't fetch again
+
   if (categoriesFetched.includes(id) || categoriesFetched.includes("all")) {
     // just filter if fetched before
     dispatch(filterRecipes(id));
   } else {
     dispatch(setRecipeCategoriesFetched(id));
     dispatch(recipesLoading());
-    return fetch(
-      baseUrl + `recipes${id !== null ? `?recipe_category.id=${id}` : ""}`
-    )
+    setTimeout(() => {
+      return fetch(
+        baseUrl + `recipes${id !== null ? `?recipe_category=${id}` : ""}`,
+        {
+          headers: {
+            Authorization: bearer,
+          },
+        }
+      )
+        .then(
+          (response) => {
+            if (response.ok) {
+              return response;
+            } else {
+              const error = new Error(
+                `Error ${response.status}: ${response.statusText}`
+              );
+              error.response = response;
+              throw error;
+            }
+          },
+          (error) => {
+            const errMess = new Error(error.message);
+            throw errMess;
+          }
+        )
+        .then((response) => response.json())
+        .then((recipes) => dispatch(addRecipes(recipes, id)))
+        .catch((error) => dispatch(recipesFailed(error.message)));
+    }, 1000);
+  }
+};
+
+export const fetchRecipeDetails = (id) => (dispatch) => {
+  dispatch(recipeDetailsLoading());
+  setTimeout(() => {
+    return fetch(baseUrl + `recipes/${id}`, {
+      headers: {
+        Authorization: bearer,
+      },
+    })
       .then(
         (response) => {
           if (response.ok) {
@@ -267,94 +371,31 @@ export const fetchRecipes = (id, categoriesFetched) => (dispatch) => {
         }
       )
       .then((response) => response.json())
-      .then((recipes) => dispatch(addRecipes(recipes, id)))
-      .catch((error) => dispatch(recipesFailed(error.message)));
-  }
+      .then((recipe) => {
+        console.log(recipe, "RECIPEEE");
+        dispatch(addRecipeDetails(recipe));
+      })
+      .catch((error) => {
+        // dispatch(recipeIngredientsFailed(error.message));
+      });
+  }, 1000);
 };
 
-export const fetchRecipeDetails = (id) => (dispatch) => {
-  dispatch(fetchRecipeIngredients(id));
-  dispatch(fetchRecipeSteps(id));
-};
-
-export const fetchRecipeIngredients = (id) => (dispatch) => {
-  dispatch(recipeIngredientsLoading());
-  return fetch(baseUrl + `recipe-ingredients?recipe=${id}`)
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          const error = new Error(
-            `Error ${response.status}: ${response.statusText}`
-          );
-          error.response = response;
-          throw error;
-        }
-      },
-      (error) => {
-        const errMess = new Error(error.message);
-        throw errMess;
-      }
-    )
-    .then((response) => response.json())
-    .then((ingredients) => dispatch(addRecipeIngredients(ingredients)))
-    .catch((error) => dispatch(recipeIngredientsFailed(error.message)));
-};
-
-export const fetchRecipeSteps = (id) => (dispatch) => {
-  dispatch(recipeStepsLoading());
-  return fetch(baseUrl + `recipe-steps?recipe=${id}`)
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          const error = new Error(
-            `Error ${response.status}: ${response.statusText}`
-          );
-          error.response = response;
-          throw error;
-        }
-      },
-      (error) => {
-        const errMess = new Error(error.message);
-        throw errMess;
-      }
-    )
-    .then((response) => response.json())
-    .then((steps) => dispatch(addRecipeSteps(steps)))
-    .catch((error) => dispatch(recipeStepsFailed(error.message)));
-};
-
-export const recipeIngredientsLoading = () => ({
-  type: ActionTypes.RECIPE_INGREDIENTS_LOADING,
+export const addRecipeDetails = (recipe) => ({
+  type: ActionTypes.ADD_RECIPE_DETAILS,
+  payload: recipe,
 });
 
-export const recipeIngredientsFailed = () => ({
-  type: ActionTypes.RECIPE_INGREDIENTS_FAILED,
+export const recipeDetailsLoading = () => ({
+  type: ActionTypes.RECIPE_DETAILS_LOADING,
 });
 
-export const addRecipeIngredients = (ingredients) => ({
-  type: ActionTypes.ADD_RECIPE_INGREDIENTS,
-  payload: ingredients,
-});
-
-export const recipeStepsLoading = () => ({
-  type: ActionTypes.RECIPE_STEPS_LOADING,
-});
-
-export const recipeStepsFailed = () => ({
-  type: ActionTypes.RECIPE_STEPS_FAILED,
-});
-
-export const addRecipeSteps = (steps) => ({
-  type: ActionTypes.ADD_RECIPE_STEPS,
-  payload: steps,
+export const recipeDetailsFailed = () => ({
+  type: ActionTypes.RECIPE_DETAILS_FAILED,
 });
 
 export const addIngredientToList = (ingredient) => (dispatch) => {
-  dispatch(shouldAddIngredientToList(ingredient.id));
+  dispatch(shouldAddIngredientToList(ingredient._id));
 
   const newGrocery = {
     grocery: ingredient.grocery,
@@ -368,6 +409,7 @@ export const addIngredientToList = (ingredient) => (dispatch) => {
     body: JSON.stringify(newGrocery),
     headers: {
       "Content-Type": "application/json",
+      Authorization: bearer,
     },
   })
     .then(
@@ -388,10 +430,10 @@ export const addIngredientToList = (ingredient) => (dispatch) => {
     )
     .then((response) => response.json())
     .then((response) => {
-      dispatch(addIngredientsProcedure(ingredient.id));
+      dispatch(addIngredientsProcedure(ingredient._id));
     })
     .catch((error) => {
-      dispatch(failedAddIngredientToList(ingredient.id));
+      dispatch(failedAddIngredientToList(ingredient._id));
     });
 };
 
@@ -448,8 +490,9 @@ export const setRecipeCategory = (cat) => ({
   payload: cat,
 });
 
-export const createRef = () => ({
+export const createRef = (cats) => ({
   type: ActionTypes.CREATE_REF,
+  payload: cats,
 });
 
 export const addNewGrocery = (grocery) => ({
@@ -464,52 +507,60 @@ export const modifyNewGrocery = (grocery) => ({
 
 export const postGrocery = (grocery, addingAgain) => (dispatch) => {
   let newGrocery = null;
+
   if (!addingAgain) {
     newGrocery = {
       grocery: {
         ...grocery,
-        category: grocery.category.id,
+        category: grocery.category._id,
       },
       custom_image: null,
       detail: "",
-      user: 0,
       timestamp: Date.now(),
     };
   } else {
     newGrocery = grocery;
   }
 
-  if (!addingAgain) dispatch(addNewGrocery(newGrocery));
-  else dispatch(addingGroceryAgain(grocery));
+  console.log(newGrocery, "TIMESTAMPTSENT");
 
-  return fetch(baseUrl + `grocery-instances${addingAgain ? "" : "s"}`, {
-    method: "POST",
-    body: JSON.stringify(newGrocery),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  })
-    .then(
-      (response) => {
-        if (response.ok) {
-          return response;
-        } else {
-          const error = new Error(
-            `Error ${response.status}: ${response.statusText}`
-          );
-          error.response = response;
+  if (!addingAgain) dispatch(addNewGrocery(newGrocery));
+  else dispatch(addingGroceryAgain(newGrocery));
+
+  setTimeout(() => {
+    return fetch(baseUrl + `grocery-instances${addingAgain ? "" : "s"}`, {
+      method: "POST",
+      body: JSON.stringify(newGrocery),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: bearer,
+      },
+    })
+      .then(
+        (response) => {
+          if (response.ok) {
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
           throw error;
         }
-      },
-      (error) => {
-        throw error;
-      }
-    )
-    .then((response) => response.json())
-    .then((response) => dispatch(modifyNewGrocery(response)))
-    .catch(() => {
-      dispatch(addNewGroceryFailed(newGrocery));
-    });
+      )
+      .then((response) => response.json())
+      .then((response) => {
+        console.log(response, "TIMESTAMPTRECEIVED");
+        dispatch(modifyNewGrocery(response));
+      })
+      .catch(() => {
+        dispatch(addNewGroceryFailed(newGrocery));
+      });
+  }, 1000);
 };
 
 export const addingGroceryAgain = (grocery) => ({
@@ -545,10 +596,10 @@ export const fetchGroceries = () => (dispatch) => {
   dispatch(groceriesLoading());
 
   return fetch(baseUrl + "groceries", {
-    method: "POST",
-    body: JSON.stringify({ name: "Cheese77" }),
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
+      Authorization: bearer,
     },
   })
     .then(
@@ -585,13 +636,15 @@ export const handleChangeNewGrocery = (v) => ({
 });
 
 export const handleChooseGrocery = (grocery) => (dispatch) => {
-  dispatch(handleSectionChange(grocery.category.id));
+  console.log(grocery.category._id, "GROOOOO");
+  dispatch(handleSectionChange(grocery.category._id));
   if (window.innerWidth < 992) dispatch(setSearchActive(false));
   dispatch(postGrocery(grocery));
 };
 
 export const handleSubmitNewGrocery = (grocery) => (dispatch) => {
-  dispatch(handleSectionChange(grocery.category.id));
+  console.log(grocery.category._id, "GROOOOO");
+  dispatch(handleSectionChange(grocery.category._id));
   if (window.innerWidth < 992) dispatch(setSearchActive(false));
   dispatch(postGrocery(grocery));
 };
@@ -692,27 +745,308 @@ export const changeRecipeCategory = (category) => ({
   payload: category,
 });
 
-export const addNewRecipe = (newRecipeDetails) => (dispatch) => {
-  console.log("DETAILSSS", newRecipeDetails);
+export const addNewRecipe =
+  (newRecipeDetails, toggleModal, resetForm) => (dispatch) => {
+    dispatch(addNewRecipeLoading());
 
-  const newRecipe = {
-    id: 0,
-    owner: {
-      name: "Manuel Assad",
-      avatar: null,
-    },
-    image:
-      "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2017/5/11/0/FNK_Pesto-Lasagna-Rolls-H_s4x3.jpg.rend.hgtvcom.966.725.suffix/1494520429705.jpeg",
-    image_detail:
-      "https://food.fnr.sndimg.com/content/dam/images/food/fullset/2017/5/11/0/FNK_Pesto-Lasagna-Rolls-H_s4x3.jpg.rend.hgtvcom.966.725.suffix/1494520429705.jpeg",
-    title: "Main Course 1",
-    servings: 2,
-    cook_time: 20,
-    prep_time: 45,
-    recipe_category: {
-      name: "Main Courses",
-      id: 0,
-      user: null,
-    },
+    setTimeout(() => {
+      return fetch(baseUrl + "recipes", {
+        method: "POST",
+        headers: {
+          Authorization: bearer,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRecipeDetails),
+      })
+        .then(
+          (response) => {
+            if (response.ok) {
+              return response;
+            } else {
+              const error = new Error(
+                `Error ${response.status}: ${response.statusText}`
+              );
+              error.response = response;
+              throw error;
+            }
+          },
+          (error) => {
+            throw error;
+          }
+        )
+        .then((response) => response.json())
+        .then((response) => {
+          dispatch(addNewRecipeToFE(response));
+          toggleModal();
+          resetForm();
+
+          setTimeout(() => {
+            dispatch(dismissAlert());
+          }, 2000);
+        })
+        .catch((error) => {
+          dispatch(addNewRecipeFailed());
+        });
+    }, 1000);
   };
+
+export const deleteRecipe = (recipeID) => (dispatch) => {
+  dispatch(deletingRecipeLoading(recipeID));
+
+  setTimeout(() => {
+    return fetch(baseUrl + `recipes/${recipeID}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: bearer,
+        "Content-Type": "application/json",
+      },
+    })
+      .then(
+        (response) => {
+          if (response.ok) {
+            return response;
+          } else {
+            const error = new Error(
+              `Error ${response.status}: ${response.statusText}`
+            );
+            error.response = response;
+            throw error;
+          }
+        },
+        (error) => {
+          throw error;
+        }
+      )
+      .then((response) => response.json())
+      .then((response) => {
+        dispatch(deleteRecipeFromFE(response));
+        setTimeout(() => {
+          dispatch(dismissAlert());
+        }, 2000);
+      })
+      .catch((error) => {
+        // dispatch(addNewRecipeFailed());
+      });
+  }, 1000);
+};
+
+export const deletingRecipeLoading = (recipe) => {
+  return {
+    type: ActionTypes.DELETING_RECIPE_LOADING,
+    payload: recipe,
+  };
+};
+
+export const deleteRecipeFromFE = (recipe) => {
+  return {
+    type: ActionTypes.DELETE_RECIPE,
+    payload: recipe,
+  };
+};
+
+export const dismissAlert = (recipe) => {
+  return {
+    type: ActionTypes.DISMISS_ALERT,
+    payload: recipe,
+  };
+};
+
+export const editRecipe =
+  (newRecipeDetails, toggleModal, resetForm, recipeID) => (dispatch) => {
+    dispatch(addNewRecipeLoading());
+
+    setTimeout(() => {
+      return fetch(baseUrl + `recipes/${recipeID}`, {
+        method: "PUT",
+        headers: {
+          Authorization: bearer,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(newRecipeDetails),
+      })
+        .then(
+          (response) => {
+            if (response.ok) {
+              return response;
+            } else {
+              const error = new Error(
+                `Error ${response.status}: ${response.statusText}`
+              );
+              error.response = response;
+              throw error;
+            }
+          },
+          (error) => {
+            throw error;
+          }
+        )
+        .then((response) => response.json())
+        .then((response) => {
+          dispatch(editRecipeInFE(response));
+          toggleModal();
+          resetForm();
+          setTimeout(() => {
+            dispatch(dismissAlert());
+          }, 2000);
+        })
+        .catch((error) => {
+          dispatch(addNewRecipeFailed());
+        });
+    }, 1000);
+  };
+
+export const addNewRecipeToFE = (recipe) => {
+  return {
+    type: ActionTypes.ADD_NEW_RECIPE,
+    payload: recipe,
+  };
+};
+
+export const editRecipeInFE = (recipe) => {
+  return {
+    type: ActionTypes.EDIT_RECIPE,
+    payload: recipe,
+  };
+};
+
+export const addNewRecipeFailed = () => {
+  return {
+    type: ActionTypes.ADD_NEW_RECIPE_FAILED,
+  };
+};
+
+export const addNewRecipeLoading = () => {
+  return {
+    type: ActionTypes.ADD_NEW_RECIPE_LOADING,
+  };
+};
+
+export const requestLogin = (creds) => {
+  return {
+    type: ActionTypes.LOGIN_REQUEST,
+    creds,
+  };
+};
+
+export const receiveLogin = (response) => {
+  return {
+    type: ActionTypes.LOGIN_SUCCESS,
+    token: response.token,
+  };
+};
+
+export const loginError = (message) => {
+  return {
+    type: ActionTypes.LOGIN_FAILURE,
+    message,
+  };
+};
+
+export const signupUser = (creds, toggleModal, setError) => (dispatch) => {
+  // We dispatch requestLogin to kickoff the call to the API
+
+  return fetch(baseUrl + "users/signup", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(creds),
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => {
+      dispatch(
+        loginUser({ username: creds.username, password: creds.password })
+      );
+      toggleModal(false);
+    })
+    .catch((error) => setError("username already exists!"));
+};
+
+export const loginUser = (creds, toggleModal, setError) => (dispatch) => {
+  // We dispatch requestLogin to kickoff the call to the API
+  console.log(creds, "CREDSSSS");
+  dispatch(requestLogin(creds));
+
+  return fetch(baseUrl + "users/login", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(creds),
+  })
+    .then(
+      (response) => {
+        if (response.ok) {
+          return response;
+        } else {
+          const error = new Error(
+            `Error ${response.status}: ${response.statusText}`
+          );
+          error.response = response;
+          throw error;
+        }
+      },
+      (error) => {
+        throw error;
+      }
+    )
+    .then((response) => response.json())
+    .then((response) => {
+      if (response.success) {
+        console.log("SUCESSSSS");
+        // If login was successful, set the token in local storage
+        localStorage.setItem("token", response.token);
+        localStorage.setItem("creds", JSON.stringify(creds));
+        // Dispatch the success action
+        // dispatch(fetchFavorites());
+        dispatch(receiveLogin(response));
+        window.location.href = "/groceries";
+      } else {
+        const error = new Error("Error " + response.status);
+        error.response = response;
+        throw error;
+      }
+      toggleModal(false);
+    })
+    .catch((error) => {
+      dispatch(loginError(error.message));
+      setError("invalid credentials!");
+    });
+};
+
+export const requestLogout = () => {
+  return {
+    type: ActionTypes.LOGOUT_REQUEST,
+  };
+};
+
+export const receiveLogout = () => {
+  return {
+    type: ActionTypes.LOGOUT_SUCCESS,
+  };
+};
+
+// Logs the user out
+export const logoutUser = () => (dispatch) => {
+  dispatch(requestLogout());
+  localStorage.removeItem("token");
+  localStorage.removeItem("creds");
+  // dispatch(favoritesFailed("Error 401: Unauthorized"));
+  dispatch(receiveLogout());
 };

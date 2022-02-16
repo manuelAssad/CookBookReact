@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Alert, Modal } from "reactstrap";
 
 import RecipeCard from "./RecipeCard";
 import RecipeMenu from "./RecipeMenu";
@@ -11,6 +12,7 @@ import {
   setSearchActive,
   handleChangeNewGrocery,
   changeRecipeCategory,
+  deleteRecipe,
 } from "../../redux/ActionCreators";
 
 import { withRouter } from "react-router-dom";
@@ -23,9 +25,15 @@ import RecipeEditModal from "./RecipeEditModal";
 
 import { fetchRecipeDetails } from "../../redux/ActionCreators";
 
+import { actions } from "react-redux-form";
+import ModalBody from "reactstrap/lib/ModalBody";
+
+import LottieAnimation from "../../components/AddedL";
+
 const mapStateToProps = (state) => {
   return {
     recipes: state.recipes,
+    auth: state.auth,
   };
 };
 
@@ -37,6 +45,7 @@ const mapDispatchToProps = {
   setSearchActive: (v) => setSearchActive(v),
   handleChangeNewGrocery: (v) => handleChangeNewGrocery(v),
   changeRecipeCategory: (category) => changeRecipeCategory(category),
+  deleteRecipe: (id) => deleteRecipe(id),
 };
 
 class Recipes extends Component {
@@ -48,6 +57,7 @@ class Recipes extends Component {
     detailsModalOpen: false,
     recipeOpen: {},
     editModalOpen: false,
+    visible: true,
   };
   componentDidMount() {
     this.props.setHistory(this.props.history);
@@ -57,7 +67,7 @@ class Recipes extends Component {
       this.props.setRecipeCategory(searchObj.category);
       this.props.changeRecipeCategory(
         this.props.recipes.categories.filter(
-          (c) => c.id == searchObj.category
+          (c) => c._id == searchObj.category
         )[0]
       );
       this.props.fetchRecipes(
@@ -83,6 +93,8 @@ class Recipes extends Component {
     return searchObj;
   };
 
+  onDismiss = () => this.setState({ visible: false });
+
   handleClickMenuItem = (id) => {
     this.props.history.push(`/recipes${id === null ? "" : `?category=${id}`}`);
     this.props.setHistory(this.props.history);
@@ -92,7 +104,7 @@ class Recipes extends Component {
       this.props.setRecipeCategory(searchObj.category);
       this.props.changeRecipeCategory(
         this.props.recipes.categories.filter(
-          (c) => c.id == searchObj.category
+          (c) => c._id == searchObj.category
         )[0]
       );
       this.props.fetchRecipes(
@@ -107,11 +119,20 @@ class Recipes extends Component {
   };
 
   handleRecipeClick = (recipe) => {
-    this.props.fetchRecipeDetails(recipe.id);
+    this.props.fetchRecipeDetails(recipe._id);
     this.setState({
       detailsModalOpen: true,
       recipeOpen: recipe,
     });
+  };
+
+  handleEditRecipe = (recipe) => {
+    this.props.fetchRecipeDetails(recipe._id);
+    this.setState({ recipeOpen: recipe, editModalOpen: true, editMode: true });
+  };
+
+  handleDeleteRecipe = (recipeID) => {
+    this.props.deleteRecipe(recipeID);
   };
 
   render() {
@@ -120,8 +141,15 @@ class Recipes extends Component {
         <RecipeEditModal
           modalOpen={this.state.editModalOpen}
           toggleModal={() => {
-            this.setState({ editModalOpen: !this.state.editModalOpen });
+            this.setState({
+              editModalOpen: !this.state.editModalOpen,
+            });
           }}
+          editMode={this.state.editMode}
+          recipe={this.state.recipeOpen}
+          recipeIngredients={this.props.recipes.recipeIngredients}
+          recipePrepSteps={this.props.recipes.recipeSteps}
+          loading={this.props.recipes.recipeDetailsLoading}
         />
         <RecipeDetailsModal
           modalOpen={this.state.detailsModalOpen}
@@ -131,6 +159,33 @@ class Recipes extends Component {
           recipeOpen={this.state.recipeOpen}
         />
         <div className="grocery-container px-4 recipes-list-container">
+          <div className="fixed-top">
+            <Modal
+              isOpen={
+                this.props.recipes.addedNewRecipe ||
+                this.props.recipes.editedRecipe ||
+                this.props.recipes.deletedRecipe
+                  ? true
+                  : false
+              }
+            >
+              <ModalBody>
+                <LottieAnimation />
+                <div className="text-center" style={{ fontSize: 20 }}>
+                  Recipe{" "}
+                  {this.props.recipes.addedNewRecipe
+                    ? "Added"
+                    : this.props.recipes.deletedRecipe
+                    ? "Deleted"
+                    : this.props.recipes.editedRecipe
+                    ? "Updated"
+                    : ""}{" "}
+                  Successfully
+                </div>
+              </ModalBody>
+            </Modal>
+          </div>
+
           <div className="row">
             {this.props.recipes.isLoading &&
             !this.props.recipes.categoriesFetched.length ? (
@@ -215,13 +270,16 @@ class Recipes extends Component {
                   })}
                 </>
               ) : (
-                <div className="row">
+                <div className="row" style={{ marginTop: 20 }}>
                   {this.props.recipes.filteredRecipes.map((recipe) => {
                     return (
                       <RecipeCard
+                        handleDeleteRecipe={this.handleDeleteRecipe}
                         handleRecipeClick={() => this.handleRecipeClick(recipe)}
-                        key={recipe.id}
+                        key={recipe._id}
                         recipe={recipe}
+                        user={this.props.auth.user}
+                        handleEditRecipe={() => this.handleEditRecipe(recipe)}
                       />
                     );
                   })}
@@ -230,6 +288,7 @@ class Recipes extends Component {
                     onClick={() =>
                       this.setState({
                         editModalOpen: !this.state.editModalOpen,
+                        editMode: false,
                       })
                     }
                   >

@@ -20,13 +20,13 @@ class MobileTabs extends Component {
         {this.props.data.map((item) => {
           return (
             <div
-              id={`mobile-tab-${this.props.groupName}-${item.id}`}
+              id={`mobile-tab-${this.props.groupName}-${item._id}`}
               class={`mr-1 ${
-                this.props.activeTab == item.id
+                this.props.activeTab == item._id
                   ? "mobile-tab-item-active"
                   : "mobile-tab-item"
               }`}
-              onClick={() => this.props.onTabClick(item.id)}
+              onClick={() => this.props.onTabClick(item._id)}
             >
               {item.name}
             </div>

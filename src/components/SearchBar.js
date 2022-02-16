@@ -88,6 +88,7 @@ class SearchBar extends Component {
     };
     return (
       <div className="input-group ing-search-container mb-2">
+        {console.log("GROCERIESSSAA", this.props.groceries)}
         <label for="ingredient2" className="input-group-prepend">
           <span
             className="input-group-text ingredient-search bg-ing"
@@ -186,12 +187,12 @@ class SearchBar extends Component {
                   return (
                     <div>
                       {this.props.groceries.filteredGroceries.filter(
-                        (g) => g.category.id == cat.id
+                        (g) => g.category._id == cat._id
                       ).length ? (
                         <div className="search-cat">{cat.name}</div>
                       ) : null}
                       {this.props.groceries.filteredGroceries
-                        .filter((grocery) => grocery.category.id === cat.id)
+                        .filter((grocery) => grocery.category._id === cat._id)
                         .map((g) => {
                           return (
                             <div className="mb-1 pb-2 ml-1 border-bottom added-item d-flex">
@@ -216,14 +217,14 @@ class SearchBar extends Component {
                               </span>
 
                               {this.props.groceryInstances.groceryInstances.filter(
-                                (gI) => gI.grocery.id === g.id
+                                (gI) => gI.grocery._id === g._id
                               ).length && !this.props.recipeEditMode ? (
                                 <>
                                   <span className="grocery-search-qty">
                                     -{" "}
                                     {
                                       this.props.groceryInstances.groceryInstances.filter(
-                                        (gI) => gI.grocery.id === g.id
+                                        (gI) => gI.grocery._id === g._id
                                       ).length
                                     }{" "}
                                     in list
@@ -232,7 +233,7 @@ class SearchBar extends Component {
                                   {this.props.groceryInstances
                                     .groceryInstanceToFilter ? (
                                     this.props.groceryInstances
-                                      .groceryInstanceToFilter.id === g.id ? (
+                                      .groceryInstanceToFilter._id === g._id ? (
                                       <div
                                         className="ml-auto d-flex filter-active-container"
                                         onClick={() => handleViewAllClick(null)}
@@ -261,7 +262,8 @@ class SearchBar extends Component {
                                             style={{
                                               opacity:
                                                 this.props.groceryInstances.groceryInstances.filter(
-                                                  (gI) => gI.grocery.id === g.id
+                                                  (gI) =>
+                                                    gI.grocery._id === g._id
                                                 ).length > 1
                                                   ? 1
                                                   : 0,
@@ -290,7 +292,7 @@ class SearchBar extends Component {
                                           style={{
                                             opacity:
                                               this.props.groceryInstances.groceryInstances.filter(
-                                                (gI) => gI.grocery.id === g.id
+                                                (gI) => gI.grocery._id === g._id
                                               ).length > 1
                                                 ? 1
                                                 : 0,

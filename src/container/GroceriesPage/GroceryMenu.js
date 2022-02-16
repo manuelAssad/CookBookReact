@@ -68,23 +68,27 @@ class GroceryMenu extends Component {
               </div>
             ) : (
               <>
+                {console.log(
+                  this.props.groceryCategories.groceryCategories,
+                  "GROCERYCATEGORIESS"
+                )}
                 {this.props.groceryCategories.groceryCategories.map(
                   (cat, i) => {
                     return (
                       <>
                         {this.props.groceryInstances.groceryInstances.filter(
-                          (g) => g.grocery.category === cat.id
+                          (g) => g.grocery.category === cat._id
                         ).length ? (
                           <a
-                            key={cat.id}
+                            key={cat._id}
                             className={`list-group-item list-group-item-action ${
-                              this.props.groceryCategories.activeCat === cat.id
+                              this.props.groceryCategories.activeCat === cat._id
                                 ? "active"
                                 : ""
                             }`}
                             onClick={() => {
                               this.props.handleClickCategory(
-                                cat.id,
+                                cat._id,
                                 this.props.groceryInstances.refObj
                               );
                               this.props.pauseDetection();

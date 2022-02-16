@@ -68,7 +68,7 @@ class Groceries extends Component {
     const handleSectionVisible = (v, cat) => {
       if (v) {
         console.log(v, cat, "SCROLLLDETECTTT");
-        this.props.handleSectionChange(cat.id);
+        this.props.handleSectionChange(cat._id);
       }
     };
     return (
@@ -188,12 +188,21 @@ class Groceries extends Component {
                         </div>
                       </div>
                     ) : null}
+                    {!this.props.groceryInstances.length && (
+                      <>
+                        <div className="mt-2">No groceries in list</div>
+                        <div className="mt-3">
+                          {" "}
+                          Add your first grocery item from the searchbar!
+                        </div>
+                      </>
+                    )}
                     {this.props.groceryCategories.groceryCategories.map(
                       (category) => {
                         return (
                           <VisibilitySensor
                             active={this.props.groceryCategories.scrollActive}
-                            key={category.id}
+                            key={category._id}
                             onChange={(v) => handleSectionVisible(v, category)}
                             partialVisibility={true}
                             offset={{
@@ -212,7 +221,7 @@ class Groceries extends Component {
                                     ? false
                                     : this.props.groceryInstances.filter(
                                         (g) =>
-                                          g.grocery.category === category.id
+                                          g.grocery.category === category._id
                                       ).length
                                 }
                                 category={category}

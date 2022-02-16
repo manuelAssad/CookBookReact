@@ -18,13 +18,10 @@ export const GroceryInstances = (
   switch (action.type) {
     case ActionTypes.CREATE_REF:
       const refObjCopy = { ...state.refObj };
-      refObjCopy.c0 = React.createRef();
-      refObjCopy.c1 = React.createRef();
-      refObjCopy.c2 = React.createRef();
-      refObjCopy.c3 = React.createRef();
-      refObjCopy.c4 = React.createRef();
-      refObjCopy.c5 = React.createRef();
-      refObjCopy.c6 = React.createRef();
+
+      action.payload.forEach((cat) => {
+        refObjCopy[`c${cat._id}`] = React.createRef();
+      });
       return {
         ...state,
         refObj: refObjCopy,
@@ -47,7 +44,7 @@ export const GroceryInstances = (
       let groceryInstanceFiltered = [];
       if (action.payload)
         groceryInstanceFiltered = state.groceryInstances.filter(
-          (g) => action.payload.id === g.grocery.id
+          (g) => action.payload._id === g.grocery._id
         );
 
       return {
@@ -74,6 +71,7 @@ export const GroceryInstances = (
         new: true,
       });
 
+      console.log(action.payload, "BROOO");
       setTimeout(() => {
         const scrollData =
           state.refObj[`c${action.payload.grocery.category}`].current;
@@ -142,6 +140,12 @@ export const GroceryInstances = (
         (item) => item.timestamp === action.payload.timestamp
       );
 
+      console.log(
+        action.payload.timestamp,
+        state.groceryInstances,
+        "COMPAREEEE"
+      );
+
       const groceryInstancesCopyA = [...state.groceryInstances];
 
       const newGrocerInstanceA = groceryInstancesCopyA[indexOfNewItemA];
@@ -168,6 +172,14 @@ export const GroceryInstances = (
         );
       }
 
+      console.log(
+        groceryInstancesCopyA,
+        filteredGroceryInstancesCopyA,
+        "NEWLISTSSS",
+        state.groceryInstances,
+        state.filteredGroceryInstances
+      );
+
       return {
         ...state,
         groceryInstances: groceryInstancesCopyA,
@@ -176,10 +188,17 @@ export const GroceryInstances = (
 
     case ActionTypes.MODIFY_NEW_GROCERY:
       const indexOfNewItem = state.groceryInstances.findIndex(
-        (item) => item.timestamp === action.payload.timestamp
+        (item) => item.timestamp == action.payload.timestamp
       );
 
       const groceryInstancesCopy2 = [...state.groceryInstances];
+
+      console.log(
+        indexOfNewItem,
+        "indexOfNewItem",
+        action.payload.timestamp,
+        state.groceryInstances
+      );
 
       groceryInstancesCopy2.splice(indexOfNewItem, 1);
       groceryInstancesCopy2.splice(indexOfNewItem, 0, action.payload);
@@ -202,6 +221,12 @@ export const GroceryInstances = (
         );
       }
 
+      console.log(
+        state.groceryInstances,
+        groceryInstancesCopy2,
+        "COMAPREMODIFYYYY"
+      );
+
       return {
         ...state,
         groceryInstances: groceryInstancesCopy2,
@@ -210,7 +235,7 @@ export const GroceryInstances = (
 
     case ActionTypes.SHOULD_UPDATE_GROCERY_INSTANCE_DETAIL:
       const indexOfNewItemDSU = state.groceryInstances.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => item._id === action.payload._id
       );
 
       const newGroceryInstanceItemDSU =
@@ -233,7 +258,7 @@ export const GroceryInstances = (
       if (state.groceryInstanceToFilter) {
         const filteredIndexOfNewItemDSU =
           state.filteredGroceryInstances.findIndex(
-            (item) => item.id === action.payload.id
+            (item) => item._id === action.payload._id
           );
 
         const filteredNewGroceryInstanceItemDSU =
@@ -256,7 +281,7 @@ export const GroceryInstances = (
 
     case ActionTypes.SUCCESS_UPDATE_GROCERY_INSTANCE_DETAIL:
       const indexOfNewItemDSSU = state.groceryInstances.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => item._id === action.payload._id
       );
 
       const groceryInstancesCopyDSSU = [...state.groceryInstances];
@@ -283,7 +308,7 @@ export const GroceryInstances = (
       if (state.groceryInstanceToFilter) {
         const filteredIndexOfNewItemDSSU =
           state.filteredGroceryInstances.findIndex(
-            (item) => item.id === action.payload.id
+            (item) => item._id === action.payload._id
           );
 
         const filteredNewGroceryInstanceItemDSSU =
@@ -308,7 +333,7 @@ export const GroceryInstances = (
 
     case ActionTypes.GROCERY_INSTANCE_DETAIL_FAILED:
       const indexOfNewItemDFU = state.groceryInstances.findIndex(
-        (item) => item.id === action.payload.id
+        (item) => item._id === action.payload._id
       );
 
       const newGroceryInstanceItemDFU =
@@ -332,7 +357,7 @@ export const GroceryInstances = (
       if (state.groceryInstanceToFilter) {
         const filteredIndexOfNewItemDFU =
           state.filteredGroceryInstances.findIndex(
-            (item) => item.id === action.payload.id
+            (item) => item._id === action.payload._id
           );
 
         const filteredNewGroceryInstanceItemDFU =
@@ -357,7 +382,7 @@ export const GroceryInstances = (
       const groceryInstancesCopy3 = [...state.groceryInstances];
 
       const indexOfNewItem3 = state.groceryInstances.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       const groceryInstanceToBeCrossed = groceryInstancesCopy3[indexOfNewItem3];
@@ -380,11 +405,11 @@ export const GroceryInstances = (
       const filteredGroceryInstancesCopy = [...state.filteredGroceryInstances];
 
       const indexOfNewItem4 = state.groceryInstances.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       const indexOfNewItemFiltered = state.filteredGroceryInstances.findIndex(
-        (item) => item.id === action.payload
+        (item) => item._id === action.payload
       );
 
       groceryInstancesCopy4.splice(indexOfNewItem4, 1);

@@ -12,6 +12,7 @@ export const InitialRecipeDetails = (
     prepSteps: [],
     ingredientToEdit: {},
     prepStepToEdit: {},
+    imageFile: "",
   },
   action
 ) => {
@@ -35,8 +36,9 @@ export const InitialRecipeDetails = (
     case ActionTypes.UPGRADE_INGREDIENTS_LIST:
       const originalList = [...action.payload];
       const newList = [];
+      console.log(originalList, "ORIGINALLISTTTT");
       originalList.forEach((item, i) => {
-        const newItem = item;
+        const newItem = { ...item };
         newItem.position = i;
         newList.push(newItem);
       });
@@ -49,7 +51,7 @@ export const InitialRecipeDetails = (
       const originalListP = [...action.payload];
       const newListP = [];
       originalListP.forEach((item, i) => {
-        const newItemP = item;
+        const newItemP = { ...item };
         newItemP.position = i;
         newListP.push(newItemP);
       });

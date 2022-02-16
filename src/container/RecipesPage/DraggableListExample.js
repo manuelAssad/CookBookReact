@@ -56,7 +56,7 @@ const Container = (props) => {
   const [cards, setCards] = useState(ITEMS);
 
   const findCard = (id) => {
-    const card = cards.filter((c) => `${c.id}` === id)[0];
+    const card = cards.filter((c) => `${c._id}` === id)[0];
     return {
       card,
       index: cards.indexOf(card),
@@ -79,8 +79,8 @@ const Container = (props) => {
     <div ref={drop} style={style}>
       {cards.map((card) => (
         <Card
-          key={card.id}
-          id={`${card.id}`}
+          key={card._id}
+          id={`${card._id}`}
           text={card.text}
           moveCard={moveCard}
           findCard={findCard}

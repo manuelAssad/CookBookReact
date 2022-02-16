@@ -14,6 +14,8 @@ import OutsideClickHandler from "react-outside-click-handler";
 import Spinner from "../../components/SpinnerGL";
 import Error from "../../components/ErrorGL";
 
+import { baseUrl } from "../../shared/baseUrl";
+
 const GroceryCard = (props) => {
   useEffect(() => {
     console.log("SHOULDUPDATEEEEE", props.item);
@@ -42,10 +44,10 @@ const GroceryCard = (props) => {
     <div
       className={`col-xl-2 col-lg-3 col-md-3 col-4 col-4 p-0`}
       onClick={() =>
-        props.item.id ? null : dispatch(postGrocery(props.item, true))
+        props.item._id ? null : dispatch(postGrocery(props.item, true))
       }
     >
-      <div className={`${!props.item.id ? "vibrate" : null}`}>
+      <div className={`${!props.item._id ? "vibrate" : null}`}>
         <div
           className={` ${
             props.item.crossed ? "striked-out" : null
@@ -56,14 +58,14 @@ const GroceryCard = (props) => {
               props.item.crossed ? "striked-out" : null
             } small-card-padding ${
               props.groceryInstances.filter(
-                (g) => g.grocery.category === props.category.id
+                (g) => g.grocery.category === props.category._id
               ).length === 1
                 ? "border-r-one-item"
                 : !props.index
                 ? "border-r-top-left"
                 : props.index + 1 ===
                   props.groceryInstances.filter(
-                    (g) => g.grocery.category === props.category.id
+                    (g) => g.grocery.category === props.category._id
                   ).length
                 ? "border-r-bottom-right"
                 : "no-border-r"
@@ -87,7 +89,7 @@ const GroceryCard = (props) => {
               >
                 <span
                   className={`card-header-name ${
-                    props.itemOnFocus === props.item.id
+                    props.itemOnFocus === props.item._id
                       ? props.item.crossed
                         ? "strike"
                         : "strike-remove"
@@ -97,7 +99,7 @@ const GroceryCard = (props) => {
                   }`}
                 >
                   {props.item.grocery.name.slice(0, 12)}{" "}
-                  {!props.item.id ? (
+                  {!props.item._id ? (
                     <i
                       className="fa fa-exclamation-triangle ml-auto hvr-grow"
                       style={{ color: "red" }}
@@ -111,7 +113,7 @@ const GroceryCard = (props) => {
                 <input
                   className="grocery-note"
                   placeholder="add detail"
-                  value={!props.item.id ? "failed to upload" : cardDetail}
+                  value={!props.item._id ? "failed to upload" : cardDetail}
                   onChange={handleEditDetail}
                 />
               </OutsideClickHandler>
@@ -125,9 +127,9 @@ const GroceryCard = (props) => {
                 className="card-image"
                 src={
                   props.item.custom_image === null
-                    ? props.item.grocery.default_image
+                    ? `${baseUrl}/${props.item.grocery.default_image}`
                     : props.item.grocery.custom_images.filter(
-                        (img) => img.id === props.item.custom_image
+                        (img) => img._id === props.item.custom_image
                       )[0].url
                 }
               />
@@ -141,7 +143,7 @@ const GroceryCard = (props) => {
               data-toggle="modal"
               onClick={
                 props.item.crossed
-                  ? () => props.handleDeleteClick(props.item.id)
+                  ? () => props.handleDeleteClick(props.item._id)
                   : "edit"
               }
             >
@@ -182,14 +184,14 @@ const GroceriesList = (props) => {
   };
 
   const handleCrossOutItem = (item) => {
-    setItemOnFocus(item.id);
+    setItemOnFocus(item._id);
     props.crossOutGroceryInstanceInServer(item);
   };
 
   return (
     <div
       className="tab-pane fade show active"
-      ref={props.refObj[`c${props.category.id}`]}
+      ref={props.refObj[`c${props.category._id}`]}
     >
       {console.log("LISTTTRENDERED", props.groceryInstances)}
       <div className="container mb-2">
@@ -205,7 +207,7 @@ const GroceriesList = (props) => {
                 (
                 {
                   props.groceryInstances.filter(
-                    (grocery) => grocery.grocery.category === props.category.id
+                    (grocery) => grocery.grocery.category === props.category._id
                   ).length
                 }{" "}
                 Items )
@@ -216,21 +218,21 @@ const GroceriesList = (props) => {
 
         <div className="row">
           {props.groceryInstances
-            .filter((g) => g.grocery.category === props.category.id)
+            .filter((g) => g.grocery.category === props.category._id)
             .map((item, index) => {
               return (
                 <>
-                  {item.id === undefined && item.new ? (
+                  {item._id === undefined && item.new ? (
                     <div
                       className={`col-xl-2 col-lg-3 col-md-3 col-4 col-4 rainbow
                                    `}
-                      key={item.id}
+                      key={item._id}
                     >
                       <div className={`small-card-padding `}>
                         <div
                           className={`card ${
                             props.groceryInstances.filter(
-                              (g) => g.grocery.category === props.category.id
+                              (g) => g.grocery.category === props.category._id
                             ).length === 1
                               ? "border-r-one-item"
                               : !index
@@ -238,7 +240,7 @@ const GroceriesList = (props) => {
                               : index + 1 ===
                                 props.groceryInstances.filter(
                                   (g) =>
-                                    g.grocery.category === props.category.id
+                                    g.grocery.category === props.category._id
                                 ).length
                               ? "border-r-bottom-right"
                               : "no-border-r"
@@ -265,9 +267,9 @@ const GroceriesList = (props) => {
                               className="card-image"
                               src={
                                 item.custom_image === null
-                                  ? item.grocery.default_image
+                                  ? `${baseUrl}/${item.grocery.default_image}`
                                   : item.grocery.custom_images.filter(
-                                      (img) => img.id === item.custom_image
+                                      (img) => img._id === item.custom_image
                                     )[0].url
                               }
                             />
@@ -292,10 +294,10 @@ const GroceriesList = (props) => {
                     </div>
                   ) : (
                     <CSSTransition
-                      key={item.id}
+                      key={item._id}
                       timeout={400}
                       classNames="cardAnimation"
-                      in={itemToBeDeleted === item.id ? false : true}
+                      in={itemToBeDeleted === item._id ? false : true}
                     >
                       <GroceryCard
                         item={item}

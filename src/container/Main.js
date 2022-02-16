@@ -12,6 +12,7 @@ import { connect } from "react-redux";
 import {
   fetchGroceryInstances,
   fetchGroceryCategories,
+  fetchRecipeCategories,
   postGrocery,
   createRef,
   fetchGroceries,
@@ -33,6 +34,7 @@ const mapDispatchToProps = {
   createRef: () => createRef(),
   fetchGroceries: () => fetchGroceries(),
   setSearchActive: (value) => setSearchActive(value),
+  fetchRecipeCategories: () => fetchRecipeCategories(),
 };
 
 class Main extends Component {
@@ -44,10 +46,11 @@ class Main extends Component {
   }
 
   componentDidMount() {
-    this.props.createRef();
+    // this.props.createRef();
     this.props.fetchGroceryInstances();
     this.props.fetchGroceryCategories();
     this.props.fetchGroceries();
+    this.props.fetchRecipeCategories();
   }
 
   // shouldComponentUpdate() {
