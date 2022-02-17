@@ -31,12 +31,13 @@ class About extends Component {
         </div>
         <div className="row">
           <p className="mx-auto about-paragraph">
-            A former electrical engineer considering on persuing a career that
-            has more room for creativity. I believe that everyone should keep
-            searching for the career that suits them the best and this
-            definetely feels the best match form me. The love for food and
-            cooking made me decide to create my first coding project related to
-            something i really love.
+            I am an Electrical Engineer Graduate recently decided to make a
+            career shift in Software development. Always fascinated in building
+            creative products and turning ideas into reality. Always found
+            website development a career that is best suited to apply my
+            creative ideas into reality and here I am building my first web app.
+            And ive decided to build my first website related to something i
+            really have passion for!
           </p>
         </div>
 

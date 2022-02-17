@@ -66,7 +66,7 @@ export const InitialRecipeDetails = (
 
       ingredientsCopy.forEach((ing, i) => {
         if (ing.position > positionOfDeletedItem) {
-          const ingToModify = ing;
+          const ingToModify = { ...ing };
           ingToModify.position = ingToModify.position - 1;
           ingredientsCopy.splice(i, 1);
           ingredientsCopy.splice(i, 0, ingToModify);

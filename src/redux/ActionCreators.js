@@ -528,7 +528,7 @@ export const postGrocery = (grocery, addingAgain) => (dispatch) => {
   else dispatch(addingGroceryAgain(newGrocery));
 
   setTimeout(() => {
-    return fetch(baseUrl + `grocery-instances${addingAgain ? "" : "s"}`, {
+    return fetch(baseUrl + `grocery-instances`, {
       method: "POST",
       body: JSON.stringify(newGrocery),
       headers: {
@@ -887,6 +887,8 @@ export const editRecipe =
           resetForm();
           setTimeout(() => {
             dispatch(dismissAlert());
+            if (newRecipeDetails.imageFile.includes("base64"))
+              window.location.reload();
           }, 2000);
         })
         .catch((error) => {

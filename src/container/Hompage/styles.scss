@@ -121,9 +121,10 @@ $grey: #ced4da;
 }
 
 .about-image {
-  max-width: 150px;
+  width: 150px;
   height: 150px;
   border-radius: 200px;
+  background-position: center;
 }
 
 .about-paragraph {

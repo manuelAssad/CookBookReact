@@ -99,6 +99,7 @@ const RecipeCard = ({
           className="recipe-image-gradient"
           onClick={() => handleRecipeClick(recipe._id)}
         >
+          {console.log(recipe.image, "RECIPEIMAGEEE")}
           <img
             className="w-100"
             src={`${baseUrl}/${recipe.image}`}
